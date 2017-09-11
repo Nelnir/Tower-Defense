@@ -1,0 +1,9 @@
+State Default
+Font Main
+TextSize 40
+TextColor 212 255 0 255
+/State
+State Hover
+/State
+State Clicked
+/State
