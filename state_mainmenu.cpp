@@ -33,12 +33,22 @@ void State_MainMenu::OnCreate()
     eveM->AddCallback(StateType::MainMenu, "MainMenu_Quit", &State_MainMenu::Quit, this);
     eveM->AddCallback(StateType::MainMenu, "MainMenu_Play", &State_MainMenu::Play, this);
     eveM->AddCallback(StateType::MainMenu, "MainMenu_Settings", &State_MainMenu::Settings, this);
+    eveM->AddCallback(StateType::MainMenu, "MainMenu_About", &State_MainMenu::About, this);
 }
 
 void State_MainMenu::OnDestroy()
 {
+    GUI_Manager* guiM = m_stateMgr->GetContext()->m_guiManager;
+    guiM->RemoveInterface(StateType::MainMenu, "MainInterface");
+
     TextureManager* texM = m_stateMgr->GetContext()->m_textureManager;
     texM->ReleaseResource("Bg");
+
+    EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
+    eveM->RemoveCallback(StateType::MainMenu, "MainMenu_Quit");
+    eveM->RemoveCallback(StateType::MainMenu, "MainMenu_Play");
+    eveM->RemoveCallback(StateType::MainMenu, "MainMenu_Settings");
+    eveM->RemoveCallback(StateType::MainMenu, "MainMenu_About");
 }
 
 void State_MainMenu::Activate()
@@ -79,5 +89,5 @@ void State_MainMenu::Settings(EventDetails *l_details)
 
 void State_MainMenu::About(EventDetails *l_details)
 {
-    //m_stateMgr->SwitchTo();
+    m_stateMgr->SwitchTo(StateType::About);
 }

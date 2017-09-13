@@ -7,6 +7,7 @@
 #include "fontmanager.h"
 #include "gui_manager.h"
 #include "sharedcontext.h"
+#include "settings.h"
 
 class Game
 {
@@ -31,6 +32,7 @@ private:
     FontManager m_fontManager;
     GUI_Manager m_guiManager;
     StateManager m_stateManager;
+    Settings m_settings;
 };
 
 #endif // GAME_H

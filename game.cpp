@@ -9,6 +9,7 @@ Game::Game() : m_window("Very Basic Engine", sf::Vector2u(1280, 720)),
     m_context.m_textureManager = &m_textureManager;
     m_context.m_fontManager = &m_fontManager;
     m_context.m_guiManager = &m_guiManager;
+    m_context.m_settings = &m_settings;
 
     m_stateManager.SwitchTo(StateType::MainMenu);
 }

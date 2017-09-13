@@ -7,6 +7,7 @@ class EventManager;
 class TextureManager;
 class FontManager;
 class GUI_Manager;
+class Settings;
 
 struct SharedContext{
     SharedContext():m_wind(nullptr),m_eventManager(nullptr), m_textureManager(nullptr), m_fontManager(nullptr), m_guiManager(nullptr){}
@@ -15,6 +16,7 @@ struct SharedContext{
     TextureManager* m_textureManager;
     FontManager* m_fontManager;
     GUI_Manager* m_guiManager;
+    Settings* m_settings;
 };
 
 #endif // SHAREDCONTEXT_H

@@ -249,7 +249,7 @@ void GUI_Interface::Update(const float &l_dT)
         event.m_clickCoords.y = mousePos.y;
         event.m_type = GUI_EventType::None;
         if (IsInside(mousePos) && itr.second->IsInside(mousePos) && !m_titleBar.getGlobalBounds().contains(mousePos)){
-            if (itr.second->GetState() != GUI_ElementState::Neutral){
+            if (itr.second->GetState() != GUI_ElementState::Neutral || m_guiManager->IsMousePressed()){
                 continue;
             }
             itr.second->OnHover(mousePos);

@@ -33,7 +33,9 @@ SOURCES += main.cpp \
     gui_label.cpp \
     gui_textfield.cpp \
     gui_scrollbar.cpp \
-    state_mainmenu.cpp
+    state_mainmenu.cpp \
+    state_about.cpp \
+    settings.cpp
 
 HEADERS += \
     window.h \
@@ -58,7 +60,9 @@ HEADERS += \
     gui_textfield.h \
     gui_scrollbar.h \
     sharedcontext.h \
-    state_mainmenu.h
+    state_mainmenu.h \
+    state_about.h \
+    settings.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -66,4 +70,5 @@ DISTFILES += \
     Data/MainMenu1.style \
     Data/MainMenu2.style \
     Data/MainMenu3.style \
-    Data/Textures/Textures.cfg
+    Data/Textures/Textures.cfg \
+    Data/About.interface

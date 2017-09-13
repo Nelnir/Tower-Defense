@@ -12,7 +12,8 @@
 GUI_Manager::GUI_Manager(EventManager* l_evMgr, SharedContext* l_shared) :
     m_eventMgr(l_evMgr),
     m_context(l_shared),
-    m_currentState(StateType(0))
+    m_currentState(StateType(0)),
+    m_isPressed(false)
 {
     RegisterElement<GUI_Label>(GUI_ElementType::Label);
     RegisterElement<GUI_Scrollbar>(GUI_ElementType::Scrollbar);
@@ -90,6 +91,8 @@ void GUI_Manager::SetCurrentState(const StateType &l_state)
 
 void GUI_Manager::HandleClick(EventDetails* l_details)
 {
+    m_isPressed = true;
+
     auto state = m_interfaces.find(m_currentState);
     if (state == m_interfaces.end()){
         return;
@@ -111,6 +114,7 @@ void GUI_Manager::HandleClick(EventDetails* l_details)
 
 void GUI_Manager::HandleRelease(EventDetails* l_details)
 {
+    m_isPressed = false;
     auto state = m_interfaces.find(m_currentState);
     if (state == m_interfaces.end()){
         return;
@@ -121,7 +125,7 @@ void GUI_Manager::HandleRelease(EventDetails* l_details)
             continue;
         }
         if (i->GetState() == GUI_ElementState::Clicked){
-            i->OnRelease();
+                i->OnRelease();
         }
         if (i->IsBeingMoved()){
             i->StopMoving();
@@ -177,7 +181,7 @@ void GUI_Manager::Update(const float& l_dT)
             continue;
         }
         if (i->IsInside(sf::Vector2f(mousePos))){
-            if (i->GetState() == GUI_ElementState::Neutral){
+            if (i->GetState() == GUI_ElementState::Neutral && !m_isPressed){
                 i->OnHover(sf::Vector2f(mousePos));
             }
             return;

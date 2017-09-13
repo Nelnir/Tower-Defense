@@ -5,10 +5,13 @@
 #include <iostream>
 
 #include "state_mainmenu.h"
+#include "state_about.h"
+
 StateManager::StateManager(SharedContext *l_shared) :
     m_shared(l_shared)
 {
     RegisterState<State_MainMenu>(StateType::MainMenu);
+    RegisterState<State_About>(StateType::About);
 }
 
 StateManager::~StateManager()

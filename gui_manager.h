@@ -36,6 +36,8 @@ public:
     void HandleRelease(EventDetails* l_details);
     void HandleTextEntered(EventDetails* l_details);
 
+    bool IsMousePressed() { return m_isPressed; }
+
     template<class T>
     void RegisterElement(const GUI_ElementType& l_id){
         m_factory[l_id] = [](GUI_Interface* l_owner) -> GUI_Element*
@@ -54,6 +56,8 @@ private:
     StateType m_currentState;
     GUI_Factory m_factory;
     GUI_ElemTypes m_elemTypes;
+
+    bool m_isPressed;
 };
 
 #endif // GUI_MANAGER_H

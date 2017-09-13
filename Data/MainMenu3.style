@@ -8,8 +8,8 @@ TextSize 32
 TextColor 255 255 255 255
 /State
 State Hover
-TextColor 128 255 64 255
+TextColor 105 225 44 255
 /State
 State Clicked
-TextColor 128 128 128 255
+TextColor 128 255 64 255
 /State
