@@ -67,8 +67,11 @@ HEADERS += \
 DISTFILES += \
     Data/keys.cfg \
     Data/MainMenu.interface \
-    Data/MainMenu1.style \
-    Data/MainMenu2.style \
-    Data/MainMenu3.style \
     Data/Textures/Textures.cfg \
-    Data/About.interface
+    Data/About.interface \
+    Data/Styles/About.style \
+    Data/Styles/AboutText.style \
+    Data/Styles/AboutText2.style \
+    Data/Styles/MainMenu1.style \
+    Data/Styles/MainMenu2.style \
+    Data/Styles/MainMenu3.style

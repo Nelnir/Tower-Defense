@@ -266,6 +266,7 @@ bool GUI_Manager::LoadInterface(const StateType &l_state, const std::string &l_i
                 continue;
             }
             if (!i->AddElement(eType, name)){
+                std::cerr << "Error when adding element: " << name << " to: " << InterfaceName << " :interface " << std::endl;
                 continue;
             }
             GUI_Element* e = i->GetElement(name);
@@ -292,7 +293,7 @@ GUI_ElementType GUI_Manager::StringToType(const std::string &l_string)
 bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
 {
     std::ifstream file;
-    file.open(Utils::GetDataDirectory() + l_file);
+    file.open(Utils::GetStylesDirectory() + l_file);
     if(!file.is_open()){
         std::cerr << "Error when opening file: " << l_file << std::endl;
         return false;

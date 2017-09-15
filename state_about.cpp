@@ -23,7 +23,8 @@ void State_About::OnCreate()
     guiM->LoadInterface(StateType::About, "About.interface", "AboutInterface");
     GUI_Interface* interface = guiM->GetInterface(StateType::About, "AboutInterface");
     sf::Vector2f interfaceSize = interface->GetSize();
-    interface->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
+    //interface->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
+    interface->SetPosition({20, 20});
 
     eveM->AddCallback(StateType::About, "About_Back", &State_About::MainMenu, this);
 }
