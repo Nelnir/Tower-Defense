@@ -23,10 +23,10 @@ void State_About::OnCreate()
     guiM->LoadInterface(StateType::About, "About.interface", "AboutInterface");
     GUI_Interface* interface = guiM->GetInterface(StateType::About, "AboutInterface");
     sf::Vector2f interfaceSize = interface->GetSize();
-    //interface->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
-    interface->SetPosition({20, 20});
+    interface->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
 
     eveM->AddCallback(StateType::About, "About_Back", &State_About::MainMenu, this);
+    eveM->AddCallback(StateType::About, "Key_ESC", &State_About::MainMenu, this);
 }
 
 void State_About::OnDestroy()
@@ -36,6 +36,7 @@ void State_About::OnDestroy()
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->RemoveCallback(StateType::About, "About_Back");
+    eveM->RemoveCallback(StateType::About, "Key_ESC");
 }
 
 void State_About::Update(const sf::Time &l_time)

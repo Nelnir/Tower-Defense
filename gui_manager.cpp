@@ -219,7 +219,7 @@ GUI_Element* GUI_Manager::CreateElement(const GUI_ElementType &l_id, GUI_Interfa
 bool GUI_Manager::LoadInterface(const StateType &l_state, const std::string &l_interface, const std::string &l_name)
 {
     std::ifstream file;
-    file.open(Utils::GetDataDirectory() + l_interface);
+    file.open(Utils::GetInterfacesDirectory() + '\\' + l_interface);
     if(!file.is_open()){
         std::cerr << "Error when loading interface: " << l_interface << std::endl;
         return false;
@@ -293,7 +293,7 @@ GUI_ElementType GUI_Manager::StringToType(const std::string &l_string)
 bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
 {
     std::ifstream file;
-    file.open(Utils::GetStylesDirectory() + l_file);
+    file.open(Utils::GetStylesDirectory() + '\\' + l_file);
     if(!file.is_open()){
         std::cerr << "Error when opening file: " << l_file << std::endl;
         return false;

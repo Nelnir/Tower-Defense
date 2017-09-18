@@ -12,16 +12,20 @@ namespace Utils
         return std::experimental::filesystem::current_path().string();
     }
 
-    inline std::string GetTexturesDirectory() {
-        return std::experimental::filesystem::current_path().string() + "\\data\\textures\\";
+    inline std::string GetDataDirectory() {
+        return GetWorkingDirectory() + "\\data";
     }
 
-    inline std::string GetDataDirectory() {
-        return std::experimental::filesystem::current_path().string() + "\\data\\";
+    inline std::string GetTexturesDirectory() {
+        return GetDataDirectory() + "\\textures";
     }
 
     inline std::string GetStylesDirectory() {
-        return std::experimental::filesystem::current_path().string() + "\\data\\styles\\";
+        return GetDataDirectory() + "\\styles";
+    }
+
+    inline std::string GetInterfacesDirectory() {
+        return GetDataDirectory() + "\\interfaces";
     }
 
     inline void ReadQuotedString(std::stringstream& l_stream, std::string& l_string) {
@@ -59,6 +63,9 @@ namespace Utils
                 l_text.replace(start, length, l_settings->GetReleaseDate());
             else if(text == "%LICENSE%")
                 l_text.replace(start, length, l_settings->GetLicense());
+            else if(text == "%CREATOR%") {
+                l_text.replace(start, length, l_settings->GetCreator());
+            }
             else continue;
             end = 1;
         }

@@ -35,7 +35,9 @@ SOURCES += main.cpp \
     gui_scrollbar.cpp \
     state_mainmenu.cpp \
     state_about.cpp \
-    settings.cpp
+    settings.cpp \
+    state_settings.cpp \
+    state_game.cpp
 
 HEADERS += \
     window.h \
@@ -62,16 +64,20 @@ HEADERS += \
     sharedcontext.h \
     state_mainmenu.h \
     state_about.h \
-    settings.h
+    settings.h \
+    state_settings.h \
+    state_game.h
 
 DISTFILES += \
     Data/keys.cfg \
     Data/MainMenu.interface \
     Data/Textures/Textures.cfg \
-    Data/About.interface \
     Data/Styles/About.style \
     Data/Styles/AboutText.style \
     Data/Styles/AboutText2.style \
     Data/Styles/MainMenu1.style \
     Data/Styles/MainMenu2.style \
-    Data/Styles/MainMenu3.style
+    Data/Styles/MainMenu3.style \
+    Data/Interfaces/About.interface \
+    Data/Interfaces/MainMenu.interface \
+    Data/Interfaces/Settings.interface

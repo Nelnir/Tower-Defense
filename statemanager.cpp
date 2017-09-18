@@ -6,12 +6,16 @@
 
 #include "state_mainmenu.h"
 #include "state_about.h"
+#include "state_settings.h"
+#include "state_game.h"
 
 StateManager::StateManager(SharedContext *l_shared) :
     m_shared(l_shared)
 {
     RegisterState<State_MainMenu>(StateType::MainMenu);
     RegisterState<State_About>(StateType::About);
+    RegisterState<State_Settings>(StateType::Settings);
+    RegisterState<State_Game>(StateType::Game);
 }
 
 StateManager::~StateManager()

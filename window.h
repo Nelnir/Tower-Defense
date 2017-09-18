@@ -7,7 +7,7 @@
 class Window
 {
 public:
-    Window(const std::string& l_title = "Window",const sf::Vector2u& l_size = sf::Vector2u(640, 480));
+    Window(const std::string& l_title = "Window", const sf::Vector2u& l_size = sf::Vector2u(640, 480), const bool& l_resizable = true);
     ~Window();
 
     void BeginDraw(); // Clear the window.
@@ -17,6 +17,7 @@ public:
     inline bool IsDone() { return m_isDone; }
     inline bool IsFullscreen() { return m_isFullscreen; }
     inline sf::Vector2u GetWindowSize() { return m_windowSize; }
+    inline std::string GetWindowTitle() { return m_windowTitle; }
 
     inline bool isFocused() { return m_isFocused; }
     EventManager* GetEventManager() { return &m_eventManager; }
@@ -27,8 +28,9 @@ public:
     sf::RenderWindow * getRenderWindow() { return &m_window; }
 
     sf::FloatRect GetViewSpace();
+    void UpdateResolution(sf::Vector2u& l_size);
 private:
-    void Setup(const std::string& l_title, const sf::Vector2u& l_size);
+    void Setup(const std::string& l_title, const sf::Vector2u& l_size, const bool& l_resizable);
     void Destroy();
     void Create();
     sf::RenderWindow m_window;
@@ -36,6 +38,7 @@ private:
     std::string m_windowTitle;
     bool m_isDone;
     bool m_isFullscreen;
+    bool m_isResizable;
 
     EventManager m_eventManager;
     bool m_isFocused;

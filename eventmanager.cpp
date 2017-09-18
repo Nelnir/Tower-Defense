@@ -206,7 +206,7 @@ void EventManager::LoadBindings()
 {
     std::string delimiter = ":";
     std::ifstream bindings;
-    bindings.open(Utils::GetDataDirectory() + "keys.cfg");
+    bindings.open(Utils::GetDataDirectory() + "\\keys.cfg");
 
     if (!bindings.is_open()){
         std::cerr << "Failed loading keys.cfg." << std::endl;

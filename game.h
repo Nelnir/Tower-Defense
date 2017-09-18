@@ -23,6 +23,8 @@ public:
     void RestartClock();
     void LateUpdate();
 private:
+    Settings m_settings;
+
     Window m_window;
     sf::Clock m_clock;
     sf::Time m_elapsed;
@@ -32,7 +34,6 @@ private:
     FontManager m_fontManager;
     GUI_Manager m_guiManager;
     StateManager m_stateManager;
-    Settings m_settings;
 };
 
 #endif // GAME_H

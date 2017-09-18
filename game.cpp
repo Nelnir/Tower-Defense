@@ -1,6 +1,6 @@
 #include "game.h"
 #include <iostream>
-Game::Game() : m_window("Very Basic Engine", sf::Vector2u(1280, 720)),
+Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution(), false),
     m_stateManager(&m_context),
     m_guiManager(m_window.GetEventManager(), &m_context)
 {

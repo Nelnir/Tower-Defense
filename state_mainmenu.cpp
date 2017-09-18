@@ -74,7 +74,7 @@ void State_MainMenu::Draw()
 
 void State_MainMenu::Play(EventDetails *l_details)
 {
-    //m_stateMgr->SwitchTo();
+    m_stateMgr->SwitchTo(StateType::Game);
 }
 
 void State_MainMenu::Quit(EventDetails *l_details)
@@ -84,7 +84,7 @@ void State_MainMenu::Quit(EventDetails *l_details)
 
 void State_MainMenu::Settings(EventDetails *l_details)
 {
-    //m_stateMgr->SwitchTo();
+    m_stateMgr->SwitchTo(StateType::Settings);
 }
 
 void State_MainMenu::About(EventDetails *l_details)
