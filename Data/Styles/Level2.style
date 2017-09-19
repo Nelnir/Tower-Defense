@@ -1,0 +1,15 @@
+State Default
+Font Main
+TextSize 45
+TextColor 212 255 0 255
+Size 300 300
+BgImage Level2
+TextPadding 45 250
+ImageSize 300 225
+/State
+State Hover
+TextColor 0 200 0 255
+/State
+State Clicked
+TextColor 0 255 0 255
+/State

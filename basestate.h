@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
-enum class StateType {Intro = 1, MainMenu, Game, Paused, GameOver, Credits, About, Settings};
+enum class StateType {Intro = 1, MainMenu, Game, Paused, GameOver, Credits, About, Settings, SelectLevel};
 
 class StateManager;
 class BaseState

@@ -21,6 +21,7 @@ void Window::Setup(const std::string &l_title, const sf::Vector2u &l_size, const
     m_isFocused = true;
 
     m_eventManager.AddCallback(StateType(0), "Window_close", &Window::Close, this);
+    m_eventManager.AddCallback(StateType(0), "ToggleFullscreen", &Window::ToggleFullscreen, this);
 
     Create();
 }
@@ -28,10 +29,10 @@ void Window::Setup(const std::string &l_title, const sf::Vector2u &l_size, const
 void Window::Create()
 {
     auto style = (m_isFullscreen ? sf::Style::Fullscreen : sf::Style::Default);
-    if(!m_isResizable)
+    if(!m_isResizable && !m_isFullscreen)
         style = sf::Style::Close;
     m_window.create(sf::VideoMode(m_windowSize.x, m_windowSize.y, 32), m_windowTitle, style);
-    m_window.setFramerateLimit(600);
+    m_window.setFramerateLimit(60);
     m_window.setKeyRepeatEnabled(false);
 }
 

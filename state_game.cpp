@@ -15,7 +15,7 @@ State_Game::~State_Game()
 
 void State_Game::OnCreate()
 {
-
+    SetTransparent(true);
 }
 
 void State_Game::OnDestroy()

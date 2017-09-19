@@ -1,0 +1,10 @@
+State Default
+Size 128 128
+BgImage LeftArrow
+/State
+State Hover
+BgImageColor 170 210 255 255
+/State
+State Clicked
+BgImageColor 255 255 255 255
+/State

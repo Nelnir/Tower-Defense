@@ -120,8 +120,8 @@ void GUI_Element::ApplyBgStyle()
         float scaleX = 1;
         float scaleY = 1;
         auto size = m_visual.m_backgroundImage.getTexture()->getSize();
-        scaleX = CurrentStyle.m_size.x / size.x;
-        scaleY = CurrentStyle.m_size.y / size.y;
+        scaleX = CurrentStyle.m_imageSize.x / size.x;
+        scaleY = CurrentStyle.m_imageSize.y / size.y;
         m_visual.m_backgroundImage.setScale(scaleX, scaleY);
     }
     m_visual.m_backgroundImage.setPosition(m_position);

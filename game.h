@@ -8,6 +8,7 @@
 #include "gui_manager.h"
 #include "sharedcontext.h"
 #include "settings.h"
+#include "level.h"
 
 class Game
 {
@@ -34,6 +35,7 @@ private:
     FontManager m_fontManager;
     GUI_Manager m_guiManager;
     StateManager m_stateManager;
+    Level m_level;
 };
 
 #endif // GAME_H

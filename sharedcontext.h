@@ -8,6 +8,7 @@ class TextureManager;
 class FontManager;
 class GUI_Manager;
 class Settings;
+class Level;
 
 struct SharedContext{
     SharedContext():m_wind(nullptr),m_eventManager(nullptr), m_textureManager(nullptr), m_fontManager(nullptr), m_guiManager(nullptr){}
@@ -17,6 +18,7 @@ struct SharedContext{
     FontManager* m_fontManager;
     GUI_Manager* m_guiManager;
     Settings* m_settings;
+    Level* m_level;
 };
 
 #endif // SHAREDCONTEXT_H

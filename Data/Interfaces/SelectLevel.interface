@@ -1,0 +1,5 @@
+Interface Main About.style 0 0 imMovable noTitle "Title"
+Element Label Title 435 0 MainMenu2.style "Select Level"
+Element Label LeftArrow 10 265 LeftArrow.style ""
+Element Label RightArrow 1110 265 RightArrow.style ""
+Element Label Back 825 625 MainMenu3.style "Back"

@@ -74,7 +74,7 @@ void State_MainMenu::Draw()
 
 void State_MainMenu::Play(EventDetails *l_details)
 {
-    m_stateMgr->SwitchTo(StateType::Game);
+    m_stateMgr->SwitchTo(StateType::SelectLevel);
 }
 
 void State_MainMenu::Quit(EventDetails *l_details)

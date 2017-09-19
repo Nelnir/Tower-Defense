@@ -8,6 +8,7 @@
 #include "state_about.h"
 #include "state_settings.h"
 #include "state_game.h"
+#include "state_selectlevel.h"
 
 StateManager::StateManager(SharedContext *l_shared) :
     m_shared(l_shared)
@@ -16,6 +17,7 @@ StateManager::StateManager(SharedContext *l_shared) :
     RegisterState<State_About>(StateType::About);
     RegisterState<State_Settings>(StateType::Settings);
     RegisterState<State_Game>(StateType::Game);
+    RegisterState<State_SelectLevel>(StateType::SelectLevel);
 }
 
 StateManager::~StateManager()

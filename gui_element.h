@@ -14,6 +14,7 @@ struct GUI_Style{
     }
 
     sf::Vector2f m_size; // Element size.
+    sf::Vector2f m_imageSize;
     // Background properties.
     sf::Color m_backgroundColor;
     sf::Color m_elementColor;

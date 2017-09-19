@@ -98,7 +98,7 @@ void GUI_Manager::HandleClick(EventDetails* l_details)
         return;
     }
     sf::Vector2i mousePos = m_eventMgr->GetMousePos(m_context->m_wind->getRenderWindow());
-    for (auto itr = state->second.begin(); itr != state->second.end(); ++itr) ///rend? rbegin?
+    for (auto itr = --state->second.end(); itr != --state->second.begin(); --itr) ///rend? rbegin?
     {
         if (!itr->second->IsInside(sf::Vector2f(mousePos))){
             continue;
@@ -168,7 +168,7 @@ void GUI_Manager::Update(const float& l_dT)
     if (state == m_interfaces.end()){
         return;
     }
-    for (auto itr = state->second.begin(); itr != state->second.end(); ++itr) /// rbegin? rend?
+    for (auto itr = --state->second.end(); itr != --state->second.begin(); --itr) /// rbegin? rend?
     {
         GUI_Interface* i = itr->second;
         if (!i->IsActive()){
@@ -342,6 +342,7 @@ bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
 
             if (type == "Size"){
                 keystream >> TemporaryStyle.m_size.x >>TemporaryStyle.m_size.y;
+                TemporaryStyle.m_imageSize = TemporaryStyle.m_size;
             } else if (type == "BgColor"){
                 int r, g, b, a = 0;
                 keystream >> r >> g >> b >> a;
@@ -372,6 +373,8 @@ bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
                 keystream >> TemporaryStyle.m_glyph;
             } else if (type == "GlyphPadding"){
                 keystream >> TemporaryStyle.m_glyphPadding.x >> TemporaryStyle.m_glyphPadding.y;
+            } else if(type == "ImageSize"){
+                keystream >> TemporaryStyle.m_imageSize.x >> TemporaryStyle.m_imageSize.y;
             } else {
                 std::cerr << "Error: style tag '" << type << "' is unknown!" << std::endl;
             }

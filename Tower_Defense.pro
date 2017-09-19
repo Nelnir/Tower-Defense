@@ -37,7 +37,9 @@ SOURCES += main.cpp \
     state_about.cpp \
     settings.cpp \
     state_settings.cpp \
-    state_game.cpp
+    state_game.cpp \
+    state_selectlevel.cpp \
+    level.cpp
 
 HEADERS += \
     window.h \
@@ -66,7 +68,9 @@ HEADERS += \
     state_about.h \
     settings.h \
     state_settings.h \
-    state_game.h
+    state_game.h \
+    state_selectlevel.h \
+    level.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -80,4 +84,12 @@ DISTFILES += \
     Data/Styles/MainMenu3.style \
     Data/Interfaces/About.interface \
     Data/Interfaces/MainMenu.interface \
-    Data/Interfaces/Settings.interface
+    Data/Interfaces/Settings.interface \
+    Data/Interfaces/SelectLevel.interface \
+    Data/Styles/LeftArrow.style \
+    Data/Styles/RightArrow.style \
+    Data/Interfaces/SelectLevel-Levels.interface \
+    Data/Styles/SelectLevels.style \
+    Data/Styles/Level1.style \
+    Data/Styles/Level2.style \
+    Data/Styles/Level3.style
