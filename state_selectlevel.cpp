@@ -40,6 +40,10 @@ void State_SelectLevel::OnCreate()
     eveM->AddCallback(StateType::SelectLevel, "Key_ESC", &State_SelectLevel::MainMenu, this);
     eveM->AddCallback(StateType::SelectLevel, "Level_RightArrow", &State_SelectLevel::RightArrow, this);
     eveM->AddCallback(StateType::SelectLevel, "Level_LeftArrow", &State_SelectLevel::LeftArrow, this);
+
+    for(int i = 1; i <= m_stateMgr->GetContext()->m_settings->GetNumberOfLevels(); ++i){
+        eveM->AddCallback(StateType::SelectLevel, "SelectLevel" + std::to_string(i), &State_SelectLevel::StartGame, this);
+    }
 }
 
 void State_SelectLevel::OnDestroy()
@@ -52,6 +56,10 @@ void State_SelectLevel::OnDestroy()
     eveM->RemoveCallback(StateType::SelectLevel, "Key_ESC");
     eveM->RemoveCallback(StateType::SelectLevel, "Level_RightArrow");
     eveM->RemoveCallback(StateType::SelectLevel, "Level_LeftArrow");
+
+    for(int i = 1; i <= m_stateMgr->GetContext()->m_settings->GetNumberOfLevels(); ++i){
+        eveM->RemoveCallback(StateType::SelectLevel, "SelectLevel" + std::to_string(i));
+    }
 }
 
 void State_SelectLevel::Update(const sf::Time &l_time)
@@ -95,8 +103,11 @@ void State_SelectLevel::MainMenu(EventDetails *l_details)
 
 void State_SelectLevel::LeftArrow(EventDetails *l_details)
 {
-    int m_levels = m_stateMgr->GetContext()->m_level->GetNumberOfLevels();
-    if(m_levels >= m_currentVisibleLevels){
+    int m_levels = m_stateMgr->GetContext()->m_settings->GetNumberOfLevels();
+    while(m_levels % 3){
+        ++m_levels;
+    }
+    if(m_currentVisibleLevels == 3){
         return;
     }
     m_scroll = true;
@@ -112,12 +123,31 @@ void State_SelectLevel::LeftArrow(EventDetails *l_details)
 
 void State_SelectLevel::RightArrow(EventDetails *l_details)
 {
-    int m_levels = m_stateMgr->GetContext()->m_level->GetNumberOfLevels();
+    int m_levels = m_stateMgr->GetContext()->m_settings->GetNumberOfLevels();
+    while(m_levels % 3){
+        ++m_levels;
+    }
     if(m_levels <= m_currentVisibleLevels){
         return;
     }
     m_scroll = true;
     m_currentVisibleLevels += 3;
     m_destinationPercent =  m_currentVisibleLevels / m_levels * 100;
+    if(m_destinationPercent > 100){
+        m_destinationPercent = 100;
+    }
     m_tick = m_destinationPercent * m_speed;
+}
+
+void State_SelectLevel::StartGame(EventDetails *l_details)
+{
+    if(m_stateMgr->HasState(StateType::About)){
+        m_stateMgr->Remove(StateType::About);
+    }
+    if(m_stateMgr->HasState(StateType::Settings)){
+        m_stateMgr->Remove(StateType::Settings);
+    }
+    m_stateMgr->Remove(StateType::MainMenu);
+    m_stateMgr->GetContext()->m_settings->SetCurrentLevel(std::stoi(l_details->m_name.substr(l_details->m_name.find_first_of("1234567890"))));
+    m_stateMgr->SwitchTo(StateType::Game);
 }

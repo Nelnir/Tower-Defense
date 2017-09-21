@@ -1,6 +1,6 @@
 #include "settings.h"
 
-Settings::Settings()
+Settings::Settings() : m_currentLevel(1)
 {
 
 }

@@ -35,7 +35,6 @@ private:
     FontManager m_fontManager;
     GUI_Manager m_guiManager;
     StateManager m_stateManager;
-    Level m_level;
 };
 
 #endif // GAME_H

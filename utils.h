@@ -28,6 +28,10 @@ namespace Utils
         return GetDataDirectory() + "\\interfaces";
     }
 
+    inline std::string GetLevelsDirectory() {
+        return GetDataDirectory() + "\\levels";
+    }
+
     inline void ReadQuotedString(std::stringstream& l_stream, std::string& l_string) {
         l_stream >> l_string;
         if (l_string.at(0) == '"'){

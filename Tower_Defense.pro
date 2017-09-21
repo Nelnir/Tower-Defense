@@ -92,4 +92,6 @@ DISTFILES += \
     Data/Styles/SelectLevels.style \
     Data/Styles/Level1.style \
     Data/Styles/Level2.style \
-    Data/Styles/Level3.style
+    Data/Styles/Level3.style \
+    Data/Levels/Level-1.level \
+    Data/tiles.cfg

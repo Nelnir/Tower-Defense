@@ -10,10 +10,9 @@ Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution(), false
     m_context.m_fontManager = &m_fontManager;
     m_context.m_guiManager = &m_guiManager;
     m_context.m_settings = &m_settings;
-    m_context.m_level = &m_level;
 
-    //m_stateManager.SwitchTo(StateType::MainMenu);
-    m_stateManager.SwitchTo(StateType::SelectLevel);
+  //  m_stateManager.SwitchTo(StateType::MainMenu);
+    m_stateManager.SwitchTo(StateType::Game);
 }
 
 Game::~Game()

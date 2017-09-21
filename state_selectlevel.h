@@ -22,6 +22,7 @@ public:
     void MainMenu(EventDetails* l_details);
     void RightArrow(EventDetails* l_details);
     void LeftArrow(EventDetails* l_details);
+    void StartGame(EventDetails* l_details);
 private:
     int m_currentVisibleLevels;
     bool m_scroll;
