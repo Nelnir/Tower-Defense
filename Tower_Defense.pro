@@ -39,7 +39,9 @@ SOURCES += main.cpp \
     state_settings.cpp \
     state_game.cpp \
     state_selectlevel.cpp \
-    level.cpp
+    level.cpp \
+    towermanager.cpp \
+    normal_tower.cpp
 
 HEADERS += \
     window.h \
@@ -70,7 +72,10 @@ HEADERS += \
     state_settings.h \
     state_game.h \
     state_selectlevel.h \
-    level.h
+    level.h \
+    abstracttower.h \
+    towermanager.h \
+    normal_tower.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -94,4 +99,8 @@ DISTFILES += \
     Data/Styles/Level2.style \
     Data/Styles/Level3.style \
     Data/Levels/Level-1.level \
-    Data/tiles.cfg
+    Data/tiles.cfg \
+    Data/Interfaces/Game.interface \
+    Data/Styles/Game.style \
+    Data/Styles/GameTitle.style \
+    Data/Styles/Tower1.style

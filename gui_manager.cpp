@@ -375,6 +375,9 @@ bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
                 keystream >> TemporaryStyle.m_glyphPadding.x >> TemporaryStyle.m_glyphPadding.y;
             } else if(type == "ImageSize"){
                 keystream >> TemporaryStyle.m_imageSize.x >> TemporaryStyle.m_imageSize.y;
+            } else if(type == "ImageRect"){
+                keystream >> TemporaryStyle.m_imageRect.left >> TemporaryStyle.m_imageRect.top
+                          >> TemporaryStyle.m_imageRect.width >> TemporaryStyle.m_imageRect.height;
             } else {
                 std::cerr << "Error: style tag '" << type << "' is unknown!" << std::endl;
             }

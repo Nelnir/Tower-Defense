@@ -46,6 +46,7 @@ struct Tile{
 using TileMap = std::unordered_map<TileID, Tile*>;
 using TileSet = std::unordered_map<TileID, TileInfo*>;
 
+enum class Start { Left = 0, Right, Up, Down, Middle };
 
 class Level
 {
@@ -57,14 +58,20 @@ public:
     void LoadLevel(const std::string& l_file);
     void Update(const float& l_dT);
     Tile* GetTile(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
+    bool CollideWithPath(const sf::CircleShape& l_circle);
 private:
     void LoadTiles(const std::string& l_file);
+    void AddWaypoint(const sf::Vector2i& l_pos);
     unsigned int ConvertCoords(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
     TileMap m_tileMap;
     TileSet m_tileSet;
 
     SharedContext* m_context;
     sf::Vector2u m_maxMapSize;
+    sf::Vector2u m_monsterStartSpawn;
+    sf::Vector2u m_monsterEnd;
+    Start m_directionSpawn;
+    Start m_directionEnd;
 };
 
 #endif // LEVEL_H

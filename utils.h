@@ -32,6 +32,12 @@ namespace Utils
         return GetDataDirectory() + "\\levels";
     }
 
+    inline bool CirclesColliding(const float& l_radius, const sf::Vector2f& l_pos, const float& l_radius2, const sf::Vector2f& l_pos2){
+        float a_square = pow(l_pos.x - l_pos2.x, 2);
+        float b_square = pow(l_pos.y - l_pos2.y, 2);
+        return (sqrt(a_square + b_square) <= l_radius + l_radius2);
+    }
+
     inline void ReadQuotedString(std::stringstream& l_stream, std::string& l_string) {
         l_stream >> l_string;
         if (l_string.at(0) == '"'){

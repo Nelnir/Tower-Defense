@@ -28,7 +28,6 @@ public:
     sf::RenderWindow * getRenderWindow() { return &m_window; }
 
     sf::FloatRect GetViewSpace();
-    void UpdateResolution(sf::Vector2u& l_size);
 private:
     void Setup(const std::string& l_title, const sf::Vector2u& l_size, const bool& l_resizable);
     void Destroy();

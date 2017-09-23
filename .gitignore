@@ -219,6 +219,7 @@ pip-log.txt
 
 release/
 debug/
+Data/Textures/GUI
 
 *.Release
 *.Debug

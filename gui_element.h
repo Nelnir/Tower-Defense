@@ -7,7 +7,7 @@
 enum class GUI_ElementState { Neutral, Focused, Clicked };
 
 struct GUI_Style{
-    GUI_Style() : m_textSize(12), m_textCenterOrigin(false), m_backgroundImageColor(255, 255, 255, 255)
+    GUI_Style() : m_textSize(12), m_textCenterOrigin(false), m_backgroundImageColor(255, 255, 255, 255), m_imageRect(0, 0, 0, 0)
     {
         sf::Color none = {0, 0, 0, 0};
         m_backgroundColor = m_elementColor = m_textColor = none;
@@ -29,6 +29,7 @@ struct GUI_Style{
     // Glyph properties.
     std::string m_glyph;
     sf::Vector2f m_glyphPadding;
+    sf::IntRect m_imageRect;
 };
 
 struct GUI_Visual{
@@ -59,6 +60,7 @@ public:
 
     virtual void UpdateStyle(const GUI_ElementState& l_state, const GUI_Style& l_style);
     virtual void ApplyStyle();
+    virtual void UpdateBgStyle(const GUI_ElementState& l_state, const GUI_Style& l_style);
 
     void SetState(const GUI_ElementState& l_state);
     void SetPosition(const sf::Vector2f& l_position);
@@ -77,6 +79,8 @@ public:
     bool NeedsRedraw() const { return m_needsRedraw; }
     GUI_ElementState GetState() { return m_state; }
     GUI_ElementType GetType() { return m_type; }
+    GUI_Style GetStyle(const GUI_ElementState& l_state) { return m_style[l_state]; }
+    std::string GetName() { return m_name; }
 
     friend std::stringstream& operator >>(std::stringstream& l_stream, GUI_Element& b){
         b.ReadIn(l_stream);

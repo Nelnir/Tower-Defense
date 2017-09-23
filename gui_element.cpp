@@ -82,6 +82,25 @@ void GUI_Element::UpdateStyle(const GUI_ElementState& l_state, const GUI_Style& 
     }
 }
 
+void GUI_Element::UpdateBgStyle(const GUI_ElementState &l_state, const GUI_Style &l_style)
+{
+    if(l_style.m_backgroundImage != m_style[l_state].m_backgroundImage){
+        ReleaseTexture(m_style[l_state].m_backgroundImage);
+        RequireTexture(l_style.m_backgroundImage);
+    }
+
+    GUI_Style& style = m_style[l_state];
+    style.m_backgroundColor = l_style.m_backgroundColor;
+    style.m_backgroundImage = l_style.m_backgroundImage;
+    style.m_backgroundImageColor = l_style.m_backgroundImageColor;
+    style.m_imageRect = l_style.m_imageRect;
+    style.m_imageSize = l_style.m_imageSize;
+    if (l_state == m_state){
+        SetRedraw(true);
+        ApplyBgStyle();
+    }
+}
+
 void GUI_Element::ApplyStyle()
 {
      ApplyTextStyle();
@@ -120,6 +139,11 @@ void GUI_Element::ApplyBgStyle()
         float scaleX = 1;
         float scaleY = 1;
         auto size = m_visual.m_backgroundImage.getTexture()->getSize();
+        if(CurrentStyle.m_imageRect.width && CurrentStyle.m_imageRect.height){
+            m_visual.m_backgroundImage.setTextureRect(CurrentStyle.m_imageRect);
+            size.x = CurrentStyle.m_imageRect.width;
+            size.y = CurrentStyle.m_imageRect.height;
+        }
         scaleX = CurrentStyle.m_imageSize.x / size.x;
         scaleY = CurrentStyle.m_imageSize.y / size.y;
         m_visual.m_backgroundImage.setScale(scaleX, scaleY);

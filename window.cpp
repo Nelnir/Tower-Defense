@@ -66,13 +66,6 @@ void Window::ToggleFullscreen(EventDetails* l_details)
     Create();
 }
 
-void Window::UpdateResolution(sf::Vector2u &l_size)
-{
-    m_windowSize = l_size;
-    Destroy();
-    Create();
-}
-
 void Window::BeginDraw()
 {
     m_window.clear(sf::Color::Black);
