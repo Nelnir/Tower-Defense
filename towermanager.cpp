@@ -133,7 +133,9 @@ void TowerManager::Draw()
 
 void TowerManager::Update(const float& l_dT)
 {
-
+    for(auto& itr : m_towers){
+        itr.second->Update(l_dT, nullptr);
+    }
 }
 
 void TowerManager::HandleRelease(EventDetails *l_details)

@@ -32,7 +32,7 @@ void Window::Create()
     if(!m_isResizable && !m_isFullscreen)
         style = sf::Style::Close;
     m_window.create(sf::VideoMode(m_windowSize.x, m_windowSize.y, 32), m_windowTitle, style);
-    m_window.setFramerateLimit(60);
+    m_window.setFramerateLimit(600);
     m_window.setKeyRepeatEnabled(false);
 }
 

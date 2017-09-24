@@ -2,11 +2,27 @@
 #include "utils.h"
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include "window.h"
+#include "enemymanager.h"
 
-Level::Level(SharedContext* l_context) : m_context(l_context), m_maxMapSize(0, 0)
+Level::Level(SharedContext* l_context) : m_context(l_context), m_maxMapSize(0, 0), m_playing(false), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0)
 {
     LoadTiles("tiles.cfg");
+}
+
+Level::~Level() { Purge(); }
+
+void Level::Purge()
+{
+    for(auto& itr : m_waves){
+        delete itr;
+    }
+    m_waves.clear();
+    m_playing = false;
+    m_elapsed = false;
+    m_currentWave = 0;
+    m_spawnedEnemies = 0;
 }
 
 void Level::Draw(const unsigned int& l_layer)
@@ -131,12 +147,15 @@ void Level::LoadLevel(const std::string &l_file)
             keystream >> m_maxMapSize.x >> m_maxMapSize.y;
         } else if(type == "START"){
             int direction;
-            keystream >> m_monsterStartSpawn.x >> m_monsterStartSpawn.y >> direction;
-            m_directionSpawn = static_cast<Start>(direction);
+            keystream >> direction;
+            TransformPosition(m_waypoints.front(), static_cast<Direction>(direction));
         } else if(type == "END"){
             int direction;
-            keystream >> m_monsterEnd.x >> m_monsterEnd.y >> direction;
-            m_directionEnd = static_cast<Start>(direction);
+            sf::Vector2i l_pos;
+            keystream >> l_pos.x >> l_pos.y >> direction;
+            sf::Vector2f pos(l_pos.x * Sheet::Tile_Size + Sheet::Tile_Size / 2.f, l_pos.y * Sheet::Tile_Size + Sheet::Tile_Size / 2.f);
+            TransformPosition(pos, static_cast<Direction>(direction));
+            m_waypoints.emplace_back(pos);
         } else if(type == "BACKGROUND"){
             TileID tileID;
             bool towerPlaceable = false;
@@ -157,15 +176,46 @@ void Level::LoadLevel(const std::string &l_file)
                     }
                 }
             }
+        } else if(type == "WAVE"){
+            Wave * wave = new Wave;
+            keystream >> wave->m_interval;
+            while(!keystream.eof()){
+                int m_enemy;
+                keystream >> m_enemy;
+                wave->m_enemies.emplace_back(static_cast<Enemy>(m_enemy));
+            }
+            if(wave->m_enemies.empty()){
+                delete wave;
+            } else {
+                m_waves.emplace_back(wave);
+            }
+        } else if(type == "LIVES"){
+            keystream >> m_lives;
         }
-    }
-    AddWaypoint(sf::Vector2i(m_monsterEnd.x, m_monsterEnd.y));
+    };
     file.close();
+}
+
+void Level::TransformPosition(sf::Vector2f &l_pos, const Direction &l_direction)
+{
+    switch(l_direction){
+    case Direction::Down: l_pos.y += Sheet::Tile_Size;
+        break;
+    case Direction::Left: l_pos.x -= Sheet::Tile_Size;
+        break;
+    case Direction::Middle: /// nothing to do
+        break;
+    case Direction::Right: l_pos.x += Sheet::Tile_Size;
+        break;
+    case Direction::Up: l_pos.y -= Sheet::Tile_Size;
+        break;
+    }
 }
 
 void Level::AddWaypoint(const sf::Vector2i& l_pos)
 {
-
+    sf::Vector2f pos(l_pos.x * Sheet::Tile_Size + Sheet::Tile_Size / 2.f, l_pos.y * Sheet::Tile_Size + Sheet::Tile_Size / 2.f);
+    m_waypoints.emplace_back(pos);
 }
 
 void Level::LoadTiles(const std::string &l_path)
@@ -206,24 +256,67 @@ unsigned int Level::ConvertCoords(const unsigned int &l_x, const unsigned int &l
 
 void Level::Update(const float& l_dT)
 {
+    if(!m_playing){
+        return;
+    }
+    m_elapsed += l_dT;
+    Wave* current = m_waves[m_currentWave];
+    if(m_spawnedEnemies < current->m_enemies.size() && m_elapsed >= current->m_interval){
+        m_elapsed -= current->m_interval;
+        m_context->m_enemyManager->SpawnEnemy(current->m_enemies[m_spawnedEnemies++], m_waypoints[0], m_waypoints[1]);
+    }
+}
 
+template<class T>
+const T& clamp( const T& v, const T& lo, const T& hi )
+{
+    if(v < lo) return lo;
+    if(hi < v) return hi;
+    return v;
 }
 
 bool Level::CollideWithPath(const sf::CircleShape &l_circle)
 {
     sf::Vector2f pos = l_circle.getPosition();
     float radius = l_circle.getRadius();
+    pos.x += radius;
+    pos.y += radius;
     for(unsigned layer = 0; layer < static_cast<unsigned int>(Sheet::Num_Layers); ++layer){
         for(unsigned int x = 0; x < m_maxMapSize.x; ++x){
             for(unsigned int y = 0; y < m_maxMapSize.y; ++y){
                 Tile* tile = GetTile(x, y, layer);
                 if(!tile) { continue; }
                 if(tile->m_towerPlaceable && !tile->m_proporties->m_ornament) { continue; }
-                if(l_circle.getGlobalBounds().intersects(sf::FloatRect(x * Sheet::Tile_Size, y * Sheet::Tile_Size, Sheet::Tile_Size, Sheet::Tile_Size))){
+               /* if(l_circle.getGlobalBounds().intersects(sf::FloatRect(x * Sheet::Tile_Size, y * Sheet::Tile_Size, Sheet::Tile_Size, Sheet::Tile_Size))){
                     return true;
-                }
+
+                }*/
+                const float closestX = clamp(pos.x, float(x * Sheet::Tile_Size), float((x + 1) * Sheet::Tile_Size));
+                const float closestY = clamp(pos.y, float(y * Sheet::Tile_Size), float((y + 1) * Sheet::Tile_Size));
+
+                // Calculate the distance between the circle's center and this closest point
+                const float distanceX = pos.x - closestX;
+                const float distanceY = pos.y - closestY;
+
+                // If the distance is less than the circle's radius, an intersection occurs
+                const float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+                if(distanceSquared < (radius * radius))
+                    return true;
             }
         }
     }
     return false;
+}
+
+sf::Vector2f Level::GetWaypointAfter(int l_waypoint)
+{
+    if(l_waypoint + 1 == m_waypoints.size()){
+        return sf::Vector2f(-1, -1);
+    }
+    return m_waypoints[l_waypoint + 1];
+}
+
+void Level::RemoveLifes(const int &l_lifes)
+{
+    m_lives -= l_lifes;
 }

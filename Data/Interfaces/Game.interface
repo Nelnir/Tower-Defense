@@ -1,3 +1,4 @@
 Interface Main Game.style 0 0 imMovable noTitle "Title"
 Element Label Towers 10 0 GameTitle.style "Towers"
 Element Label Tower1 5 50 Tower1.style "100$"
+Element Label Start 25 690 Start.style "Start"

@@ -32,6 +32,10 @@ namespace Utils
         return GetDataDirectory() + "\\levels";
     }
 
+    inline std::string GetEnemiesDirectory() {
+        return GetDataDirectory() + "\\enemies";
+    }
+
     inline bool CirclesColliding(const float& l_radius, const sf::Vector2f& l_pos, const float& l_radius2, const sf::Vector2f& l_pos2){
         float a_square = pow(l_pos.x - l_pos2.x, 2);
         float b_square = pow(l_pos.y - l_pos2.y, 2);

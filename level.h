@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "sharedcontext.h"
 #include "texturemanager.h"
+#include "abstractenemy.h"
 
 enum Sheet{Tile_Size = 64, Sheet_Width = 1472, Sheet_Height = 832, Num_Layers = 2};
 using TileID = unsigned int;
@@ -43,15 +44,26 @@ struct Tile{
 };
 
 
+struct Wave{
+    std::vector<Enemy> m_enemies;
+    float m_interval;
+};
+
+using Waves = std::vector<Wave*>;
 using TileMap = std::unordered_map<TileID, Tile*>;
 using TileSet = std::unordered_map<TileID, TileInfo*>;
+using Waypoints = std::vector<sf::Vector2f>;
 
-enum class Start { Left = 0, Right, Up, Down, Middle };
+enum class Direction { Left = 0, Right, Up, Down, Middle };
 
 class Level
 {
 public:
     Level(SharedContext* l_context);
+    ~Level();
+
+    void StartGame() { m_playing = true; }
+    void NextWave() { ++m_currentWave; m_spawnedEnemies = 0; }
 
     void Draw(const unsigned int& l_layer);
 
@@ -59,7 +71,12 @@ public:
     void Update(const float& l_dT);
     Tile* GetTile(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
     bool CollideWithPath(const sf::CircleShape& l_circle);
+    sf::Vector2f GetWaypointAfter(int l_waypoint);
+
+    void RemoveLifes(const int& l_lifes);
 private:
+    void TransformPosition(sf::Vector2f& l_pos, const Direction& l_direction);
+    void Purge();
     void LoadTiles(const std::string& l_file);
     void AddWaypoint(const sf::Vector2i& l_pos);
     unsigned int ConvertCoords(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
@@ -68,10 +85,14 @@ private:
 
     SharedContext* m_context;
     sf::Vector2u m_maxMapSize;
-    sf::Vector2u m_monsterStartSpawn;
-    sf::Vector2u m_monsterEnd;
-    Start m_directionSpawn;
-    Start m_directionEnd;
+    sf::Vector2f m_monsterStartSpawn;
+    int m_currentWave;
+    int m_spawnedEnemies;
+    Waves m_waves;
+    bool m_playing;
+    float m_elapsed;
+    Waypoints m_waypoints;
+    int m_lives;
 };
 
 #endif // LEVEL_H

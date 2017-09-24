@@ -5,6 +5,7 @@
 #include "basestate.h"
 #include "eventmanager.h"
 #include "towermanager.h"
+#include "enemymanager.h"
 
 using Connections = std::unordered_map<std::string, TowerProporties*>;
 
@@ -26,11 +27,13 @@ public:
     void TowerPressed(EventDetails* l_details);
     void HandleRelease(EventDetails* l_details);
     void HandleKey(EventDetails* l_details);
+    void StartGame(EventDetails* l_details);
 private:
     float m_zoom;
     void PrepareElement(GUI_Element* l_element, TowerProporties* l_proporties);
     Level* m_level;
     TowerManager m_towerManager;
+    EnemyManager m_enemyManager;
     Connections m_connections;
 };
 

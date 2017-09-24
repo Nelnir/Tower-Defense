@@ -41,7 +41,10 @@ SOURCES += main.cpp \
     state_selectlevel.cpp \
     level.cpp \
     towermanager.cpp \
-    normal_tower.cpp
+    normal_tower.cpp \
+    abstractenemy.cpp \
+    enemymanager.cpp \
+    soldierenemy.cpp
 
 HEADERS += \
     window.h \
@@ -75,7 +78,10 @@ HEADERS += \
     level.h \
     abstracttower.h \
     towermanager.h \
-    normal_tower.h
+    normal_tower.h \
+    abstractenemy.h \
+    enemymanager.h \
+    soldierenemy.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -103,4 +109,7 @@ DISTFILES += \
     Data/Interfaces/Game.interface \
     Data/Styles/Game.style \
     Data/Styles/GameTitle.style \
-    Data/Styles/Tower1.style
+    Data/Styles/Tower1.style \
+    Data/Styles/Start.style \
+    Data/Enemies/Enemies.cfg \
+    Data/Enemies/Soldier.proporties

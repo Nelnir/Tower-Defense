@@ -8,9 +8,9 @@ class Normal_Tower : public AbstractTower
 public:
     Normal_Tower(TowerProporties* l_proporties, TowerManager* l_towerManager);
     void Draw(sf::RenderWindow* l_wind);
-    void Update(const float &l_dT) {}
-private:
-   // void Shot();
+    void Update(const float &l_dT, AbstractEnemy* l_lookinAt) {}
+protected:
+    void Shot(AbstractEnemy *l_enemy) {}
 };
 
 #endif // NORMAL_TOWER_H

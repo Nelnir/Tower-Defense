@@ -8,7 +8,8 @@
 #include "level.h"
 #include "towermanager.h"
 
-State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom) {}
+State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom),
+    m_enemyManager(m_stateMgr->GetContext()){}
 
 State_Game::~State_Game()
 {
@@ -18,12 +19,12 @@ State_Game::~State_Game()
 void State_Game::OnCreate()
 {
     m_stateMgr->GetContext()->m_towerManager = &m_towerManager;
+    m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;
     m_level = new Level(m_stateMgr->GetContext());
     m_stateMgr->GetContext()->m_level = m_level;
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
     m_view.setCenter(1087, 544);
     m_view.zoom(m_zoom);
-
 
     SetTransparent(true);
     GUI_Manager* guiM = m_stateMgr->GetContext()->m_guiManager;
@@ -41,6 +42,7 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "Mouse_Left_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
+    eveM->AddCallback(StateType::Game, "Start_Game", &State_Game::StartGame, this);
 }
 
 void State_Game::OnDestroy()
@@ -53,20 +55,24 @@ void State_Game::OnDestroy()
     eveM->RemoveCallback(StateType::Game, "Mouse_Left_Release");
     eveM->RemoveCallback(StateType::Game, "Mouse_Right_Release");
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
+    eveM->RemoveCallback(StateType::Game, "Start_Game");
 }
 
 void State_Game::Update(const sf::Time &l_time)
 {
     m_level->Update(l_time.asSeconds());
     m_towerManager.Update(l_time.asSeconds());
+    m_enemyManager.Update(l_time.asSeconds());
+    m_enemyManager.ProcessRequests();
 }
 
 void State_Game::Draw()
 {
     for(unsigned int i = 0; i < Sheet::Num_Layers; ++i){
-        m_level->Draw(i);
+       m_level->Draw(i);
     }
     m_towerManager.Draw();
+    m_enemyManager.Draw();
 }
 
 void State_Game::Activate()
@@ -104,4 +110,9 @@ void State_Game::PrepareElement(GUI_Element *l_element, TowerProporties *l_propo
 void State_Game::HandleKey(EventDetails *l_details)
 {
     m_towerManager.HandleKey(l_details);
+}
+
+void State_Game::StartGame(EventDetails *l_details)
+{
+    m_level->StartGame();
 }

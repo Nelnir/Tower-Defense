@@ -37,21 +37,19 @@ public:
     AbstractTower(TowerProporties* l_proporties, TowerManager* l_towerManager) : m_proporties(l_proporties), m_towerManager(l_towerManager) {}
 
     virtual void Draw(sf::RenderWindow* l_wind) = 0;
-    virtual void Update(const float& l_dT) = 0;
+    virtual void Update(const float& l_dT, AbstractEnemy* l_lookinAt) = 0;
 
     TowerProporties* GetProporties() { return m_proporties; }
     AttackStrategy GetStrategy() { return m_strategy; }
-    bool IsFocused() { return m_isFocused; }
+    sf::Vector2f GetPosition() { return m_position; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_position = l_pos; }
-    sf::Vector2f GetPosition() { return m_position; }
 protected:
-    //virtual void Shot(AbstractEnemy* l_enemy) = 0;
+    virtual void Shot(AbstractEnemy* l_enemy) = 0;
 
     unsigned int m_currentUpgrade;
     AttackStrategy m_strategy;
     TowerProporties* m_proporties;
-    bool m_isFocused;
     sf::Vector2f m_position;
 
     TowerManager* m_towerManager;
