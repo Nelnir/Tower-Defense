@@ -5,8 +5,12 @@
 #include <algorithm>
 #include "window.h"
 #include "enemymanager.h"
+#include "gui_interface.h"
+#include "abstracttower.h"
 
-Level::Level(SharedContext* l_context) : m_context(l_context), m_maxMapSize(0, 0), m_playing(false), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0)
+Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn) : m_context(l_context),
+    m_maxMapSize(0, 0), m_playing(false), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
+    m_interface(l_interface), m_connections(l_conn)
 {
     LoadTiles("tiles.cfg");
 }
@@ -189,10 +193,14 @@ void Level::LoadLevel(const std::string &l_file)
             } else {
                 m_waves.emplace_back(wave);
             }
-        } else if(type == "LIVES"){
-            keystream >> m_lives;
+        } else if(type == "LIFES"){
+            keystream >> m_lifes;
+        } else if(type == "MONEY"){
+            keystream >> m_money;
         }
     };
+    UpdateMoneyGUI();
+    UpdateLifesGUI();
     file.close();
 }
 
@@ -316,7 +324,32 @@ sf::Vector2f Level::GetWaypointAfter(int l_waypoint)
     return m_waypoints[l_waypoint + 1];
 }
 
-void Level::RemoveLifes(const int &l_lifes)
+void Level::SubtractLifes(const int &l_lifes)
 {
-    m_lives -= l_lifes;
+    m_lifes -= l_lifes;
+    UpdateLifesGUI();
+}
+
+void Level::SubtractMoney(const int &l_money)
+{
+    m_money -= l_money;
+    UpdateMoneyGUI();
+}
+
+void Level::UpdateLifesGUI()
+{
+    m_interface->GetElement("Lives")->SetText("Lifes: " + std::to_string(m_lifes));
+}
+
+void Level::UpdateMoneyGUI()
+{
+    m_interface->GetElement("Money")->SetText("Money: " + std::to_string(m_money) + m_context->m_settings->GetCurrency());
+    for(auto& itr : *m_connections){
+        TowerProporties* prop = itr.second;
+        if(prop->m_cost > m_money){
+            m_interface->GetElement(itr.first)->SetState(GUI_ElementState::Locked);
+        } else{
+            m_interface->GetElement(itr.first)->SetState(GUI_ElementState::Neutral);
+        }
+    }
 }

@@ -56,10 +56,14 @@ using Waypoints = std::vector<sf::Vector2f>;
 
 enum class Direction { Left = 0, Right, Up, Down, Middle };
 
+struct TowerProporties;
+using Connections = std::unordered_map<std::string, TowerProporties*>;
+
+class GUI_Interface;
 class Level
 {
 public:
-    Level(SharedContext* l_context);
+    Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_connections);
     ~Level();
 
     void StartGame() { m_playing = true; }
@@ -73,8 +77,11 @@ public:
     bool CollideWithPath(const sf::CircleShape& l_circle);
     sf::Vector2f GetWaypointAfter(int l_waypoint);
 
-    void RemoveLifes(const int& l_lifes);
+    void SubtractLifes(const int& l_lifes);
+    void SubtractMoney(const int& l_money);
 private:
+    void UpdateMoneyGUI();
+    void UpdateLifesGUI();
     void TransformPosition(sf::Vector2f& l_pos, const Direction& l_direction);
     void Purge();
     void LoadTiles(const std::string& l_file);
@@ -92,7 +99,11 @@ private:
     bool m_playing;
     float m_elapsed;
     Waypoints m_waypoints;
-    int m_lives;
+    int m_lifes;
+    int m_money;
+
+    GUI_Interface* m_interface;
+    Connections* m_connections;
 };
 
 #endif // LEVEL_H

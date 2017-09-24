@@ -322,13 +322,14 @@ bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
             }
             GUI_ElementState state = GUI_ElementState::Neutral;
             if(currentState == "Hover") { state = GUI_ElementState::Focused; }
-            else if (currentState == "Clicked") { state = GUI_ElementState::Clicked; }
+            else if(currentState == "Clicked") { state = GUI_ElementState::Clicked; }
+            else if(currentState == "Locked") { state = GUI_ElementState::Locked; }
 
             if(state == GUI_ElementState::Neutral){
                 ParentStyle = TemporaryStyle;
-                l_element->UpdateStyle(GUI_ElementState::Neutral, TemporaryStyle);
-                l_element->UpdateStyle(GUI_ElementState::Focused, TemporaryStyle);
-                l_element->UpdateStyle(GUI_ElementState::Clicked, TemporaryStyle);
+                for(int i = static_cast<int>(GUI_ElementState::Neutral); i < static_cast<int>(GUI_ElementState::Count); ++i){
+                    l_element->UpdateStyle(static_cast<GUI_ElementState>(i), TemporaryStyle);
+                }
             } else {
                 l_element->UpdateStyle(state, TemporaryStyle);
             }

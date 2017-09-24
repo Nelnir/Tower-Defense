@@ -150,6 +150,7 @@ void TowerManager::HandleRelease(EventDetails *l_details)
         m_placingTower = nullptr;
         return;
     }
+    m_context->m_level->SubtractMoney(m_placingTower->m_cost);
     AddTower(m_placingTower, m_placingTower->m_sprite.getPosition());
     m_placingTower = nullptr;
 }

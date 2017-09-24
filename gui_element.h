@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
-enum class GUI_ElementState { Neutral, Focused, Clicked };
+enum class GUI_ElementState { Neutral, Focused, Clicked, Locked, Count};
 
 struct GUI_Style{
     GUI_Style() : m_textSize(12), m_textCenterOrigin(false), m_backgroundImageColor(255, 255, 255, 255), m_imageRect(0, 0, 0, 0)

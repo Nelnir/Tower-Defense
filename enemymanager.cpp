@@ -112,6 +112,8 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const std::string &l_fil
             proporties->m_sprite.setTextureRect(rect);
         } else if(type == "LIFE_TAKES"){
             keystream >> proporties->m_lifeTakes;
+        } else if(type == "MONEY"){
+            keystream >> proporties->m_money;
         }
     }
     sf::IntRect size = proporties->m_sprite.getTextureRect();
@@ -142,7 +144,7 @@ void EnemyManager::GiveNextWaypoint(AbstractEnemy *l_enemy)
     if(dest.x != -1 && dest.y != -1){
         l_enemy->SetDestination(dest);
     } else{
-        m_context->m_level->RemoveLifes(l_enemy->m_proporties->m_lifeTakes);
+        m_context->m_level->SubtractLifes(l_enemy->m_proporties->m_lifeTakes);
         m_toRemove.emplace_back(l_enemy->m_unique.m_id);
     }
 }

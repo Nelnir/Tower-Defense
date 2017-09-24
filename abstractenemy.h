@@ -17,7 +17,8 @@ struct EnemyProporties{
     int m_baseHp;
     std::string m_texture;
     sf::Sprite m_sprite;
-    int m_lifeTakes; /// how much life it takes when player couldnt kill it
+    int m_lifeTakes; /// how much life it takes when it pass to the end
+    int m_money; /// how much money this monster give when killed
     union{
         twoFloats m_size;
         float m_radius;

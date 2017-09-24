@@ -112,4 +112,5 @@ DISTFILES += \
     Data/Styles/Tower1.style \
     Data/Styles/Start.style \
     Data/Enemies/Enemies.cfg \
-    Data/Enemies/Soldier.proporties
+    Data/Enemies/Soldier.proporties \
+    Data/Styles/GameText.style

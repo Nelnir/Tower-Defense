@@ -119,9 +119,13 @@ void GUI_Interface::OnClick(const sf::Vector2f& l_mousePos)
             if (!itr.second->IsInside(l_mousePos)){
                 continue;
             }
+            if(itr.second->GetState() == GUI_ElementState::Locked){
+                break;
+            }
             itr.second->OnClick(l_mousePos);
             event.m_element = itr.second->m_name.c_str();
             m_guiManager->AddEvent(event);
+            break;
         }
         SetState(GUI_ElementState::Clicked);
     }

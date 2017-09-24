@@ -13,3 +13,7 @@ TextColor 0 200 0 255
 State Clicked
 TextColor 0 255 0 255
 /State
+State Locked
+BgImageColor 128 128 128 255
+TextColor 128 128 128 255
+/State
