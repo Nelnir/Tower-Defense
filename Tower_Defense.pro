@@ -44,7 +44,8 @@ SOURCES += main.cpp \
     normal_tower.cpp \
     abstractenemy.cpp \
     enemymanager.cpp \
-    soldierenemy.cpp
+    soldierenemy.cpp \
+    state_gameover.cpp
 
 HEADERS += \
     window.h \
@@ -81,7 +82,8 @@ HEADERS += \
     normal_tower.h \
     abstractenemy.h \
     enemymanager.h \
-    soldierenemy.h
+    soldierenemy.h \
+    state_gameover.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -113,4 +115,8 @@ DISTFILES += \
     Data/Styles/Start.style \
     Data/Enemies/Enemies.cfg \
     Data/Enemies/Soldier.proporties \
-    Data/Styles/GameText.style
+    Data/Styles/GameText.style \
+    Data/Enemies/Soldier2.proporties \
+    Data/Interfaces/GameOver.interface \
+    Data/Styles/GameOver.style \
+    Data/Styles/lost.style

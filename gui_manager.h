@@ -31,6 +31,7 @@ public:
     bool PollEvent(GUI_Event& l_event);
     void Update(const float& l_dT);
     void Render(sf::RenderWindow* l_wind);
+    void Render(GUI_Interface* l_interface); /// to draw interface X when we are in other state
 
     void HandleClick(EventDetails* l_details);
     void HandleRelease(EventDetails* l_details);

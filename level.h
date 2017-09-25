@@ -45,8 +45,12 @@ struct Tile{
 
 
 struct Wave{
-    std::vector<Enemy> m_enemies;
-    float m_interval;
+    Wave(const float& l_intervale, const int& l_rewards, const float& l_time) : m_interval(l_intervale), m_reward(l_rewards), m_time(l_time){ }
+
+    std::vector<std::pair<Enemy, EnemyId>> m_enemies;
+    const float m_interval;
+    const int m_reward; /// reward for passing this wave
+    const float m_time; /// time when next wave comes
 };
 
 using Waves = std::vector<Wave*>;
@@ -66,10 +70,14 @@ public:
     Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_connections);
     ~Level();
 
-    void StartGame() { m_playing = true; }
-    void NextWave() { ++m_currentWave; m_spawnedEnemies = 0; }
+    void StartGame();
+    void StopGame();
+    void NextWave();
+    void Restart();
 
     void Draw(const unsigned int& l_layer);
+    bool IsPlaying() { return m_playing; }
+    bool Finished();
 
     void LoadLevel(const std::string& l_file);
     void Update(const float& l_dT);
@@ -79,9 +87,15 @@ public:
 
     void SubtractLifes(const int& l_lifes);
     void SubtractMoney(const int& l_money);
+    void Win();
+    void Lose();
 private:
+    void Initialize();
     void UpdateMoneyGUI();
     void UpdateLifesGUI();
+    void UpdateWaveGUI();
+    void UpdateMonstersToSpawnGUI();
+    void UpdateWaveTimeGUI();
     void TransformPosition(sf::Vector2f& l_pos, const Direction& l_direction);
     void Purge();
     void LoadTiles(const std::string& l_file);
@@ -97,10 +111,14 @@ private:
     int m_spawnedEnemies;
     Waves m_waves;
     bool m_playing;
-    float m_elapsed;
+    float m_elapsed; // to spawn enemies
+    float m_elapsedWave; // to spawn next wave
     Waypoints m_waypoints;
+    int m_baseLifes;
     int m_lifes;
+    int m_baseMoney;
     int m_money;
+    int m_previousTime; // previous time which were set to GUI next wave element
 
     GUI_Interface* m_interface;
     Connections* m_connections;

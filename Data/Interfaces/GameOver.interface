@@ -1,0 +1,6 @@
+Interface Main GameOver.style 0 0 imMovable noTitle "Title"
+Element Label Lost 565 50 lost.style "Lost"
+Element Label TryAgain 515 225 MainMenu3.style "Try again"
+Element Label Statistics 515 275 MainMenu3.style "Statistics"
+Element Label ExitGame 515 325 MainMenu3.style "Exit from game"
+Element Label ExitMenu 515 375 MainMenu3.style "Exit"

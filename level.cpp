@@ -7,21 +7,33 @@
 #include "enemymanager.h"
 #include "gui_interface.h"
 #include "abstracttower.h"
+#include "statemanager.h"
 
 Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn) : m_context(l_context),
     m_maxMapSize(0, 0), m_playing(false), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
-    m_interface(l_interface), m_connections(l_conn)
+    m_interface(l_interface), m_connections(l_conn), m_previousTime(0)
 {
     LoadTiles("tiles.cfg");
 }
 
-Level::~Level() { Purge(); }
+Level::~Level()
+{
+    Purge();
+    for(auto& itr : m_tileSet){
+        delete itr.second;
+    }
+    m_tileSet.clear();
+}
 
 void Level::Purge()
 {
     for(auto& itr : m_waves){
         delete itr;
     }
+    for(auto& itr : m_tileMap){
+        delete itr.second;
+    }
+    m_tileMap.clear();
     m_waves.clear();
     m_playing = false;
     m_elapsed = false;
@@ -181,12 +193,16 @@ void Level::LoadLevel(const std::string &l_file)
                 }
             }
         } else if(type == "WAVE"){
-            Wave * wave = new Wave;
-            keystream >> wave->m_interval;
+            float interval, time;
+            int reward;
+            keystream >> interval >> reward >> time;
+            if(time < 5){ time = 5; }
+            Wave * wave = new Wave(interval, reward, time);
             while(!keystream.eof()){
                 int m_enemy;
-                keystream >> m_enemy;
-                wave->m_enemies.emplace_back(static_cast<Enemy>(m_enemy));
+                EnemyId id;
+                keystream >> m_enemy >> id;
+                wave->m_enemies.emplace_back(std::make_pair(static_cast<Enemy>(m_enemy), id));
             }
             if(wave->m_enemies.empty()){
                 delete wave;
@@ -195,12 +211,13 @@ void Level::LoadLevel(const std::string &l_file)
             }
         } else if(type == "LIFES"){
             keystream >> m_lifes;
+            m_baseLifes = m_lifes;
         } else if(type == "MONEY"){
             keystream >> m_money;
+            m_baseMoney = m_money;
         }
     };
-    UpdateMoneyGUI();
-    UpdateLifesGUI();
+    Initialize();
     file.close();
 }
 
@@ -269,9 +286,18 @@ void Level::Update(const float& l_dT)
     }
     m_elapsed += l_dT;
     Wave* current = m_waves[m_currentWave];
+    m_elapsedWave -= l_dT;
     if(m_spawnedEnemies < current->m_enemies.size() && m_elapsed >= current->m_interval){
         m_elapsed -= current->m_interval;
-        m_context->m_enemyManager->SpawnEnemy(current->m_enemies[m_spawnedEnemies++], m_waypoints[0], m_waypoints[1]);
+        auto& enemy = current->m_enemies[m_spawnedEnemies++];
+        m_context->m_enemyManager->SpawnEnemy(enemy.first, enemy.second, m_waypoints[0], m_waypoints[1]);
+        UpdateMonstersToSpawnGUI();
+    }
+    if(m_currentWave < m_waves.size()){
+        UpdateWaveTimeGUI();
+        if(m_elapsedWave <= 0 && m_currentWave + 1 < m_waves.size()){
+            NextWave();
+        }
     }
 }
 
@@ -328,6 +354,9 @@ void Level::SubtractLifes(const int &l_lifes)
 {
     m_lifes -= l_lifes;
     UpdateLifesGUI();
+    if(m_lifes <= 0){
+        Lose();
+    }
 }
 
 void Level::SubtractMoney(const int &l_money)
@@ -352,4 +381,98 @@ void Level::UpdateMoneyGUI()
             m_interface->GetElement(itr.first)->SetState(GUI_ElementState::Neutral);
         }
     }
+}
+
+void Level::UpdateWaveGUI()
+{
+    m_interface->GetElement("Wave")->SetText("Wave: " + std::to_string(m_currentWave + 1) + " / " + std::to_string(m_waves.size()));
+}
+
+void Level::UpdateMonstersToSpawnGUI()
+{
+    int toSpawn = m_waves[m_currentWave]->m_enemies.size() - m_spawnedEnemies;
+    m_interface->GetElement("MonstersSpawn")->SetText("To spawn: " + (toSpawn ? std::to_string(toSpawn) : "-"));
+}
+
+void Level::UpdateWaveTimeGUI()
+{
+    if(m_currentWave + 1 < m_waves.size()){
+        int timeToSet = static_cast<int>(m_elapsedWave);
+        if(timeToSet != m_previousTime){
+            m_previousTime = timeToSet;
+            if(timeToSet >= 0){
+                m_interface->GetElement("WaveTime")->SetText("Next in: " + std::to_string(timeToSet));
+            }
+        }
+    } else {
+        m_interface->GetElement("WaveTime")->SetText("Next in: ---");
+    }
+}
+
+void Level::NextWave()
+{
+    Wave* wave = m_waves[m_currentWave];
+    m_money += wave->m_reward;
+    UpdateMoneyGUI();
+    ++m_currentWave;
+    wave = m_waves[m_currentWave];
+    m_spawnedEnemies = 0;
+    m_elapsed = wave->m_interval;
+    m_elapsedWave = wave->m_time;
+    m_elapsedWave += wave->m_interval * wave->m_enemies.size();
+    UpdateWaveGUI();
+    UpdateMonstersToSpawnGUI();
+}
+
+void Level::StartGame()
+{
+    m_playing = true;
+    m_interface->GetElement("Start")->SetText("Pause");
+}
+
+void Level::StopGame()
+{
+    m_playing = false;
+    m_interface->GetElement("Start")->SetText("Resume");
+}
+
+void Level::Win()
+{
+    if(!m_context->m_stateMgr->HasState(StateType::GameOver)){
+        //m_context->m_stateMgr->SwitchTo(StateType::Win);
+    }
+}
+
+void Level::Lose()
+{
+    m_context->m_stateMgr->SwitchTo(StateType::GameOver);
+    m_interface->SetContentRedraw(true); /// well in State_GameOver we are drawning this interface manually, but it wont change it content if it wont be able
+    /// to call it's update method, so we set manually flag for redrawning to show updated lifes
+}
+
+bool Level::Finished()
+{
+    return (m_currentWave + 1 == m_waves.size() && m_spawnedEnemies == m_waves.back()->m_enemies.size());
+}
+
+void Level::Restart()
+{
+    m_playing = false;
+    Initialize();
+    m_interface->GetElement("Start")->SetText("Start");
+}
+
+void Level::Initialize()
+{
+    m_elapsed = m_waves.front()->m_interval;
+    m_currentWave = 0;
+    m_spawnedEnemies = 0;
+    m_money = m_baseMoney;
+    m_lifes = m_baseLifes;
+    m_elapsedWave = m_waves.front()->m_time + m_waves.front()->m_interval * m_waves.front()->m_enemies.size();
+    UpdateMoneyGUI();
+    UpdateLifesGUI();
+    UpdateMonstersToSpawnGUI();
+    UpdateWaveGUI();
+    UpdateWaveTimeGUI();
 }

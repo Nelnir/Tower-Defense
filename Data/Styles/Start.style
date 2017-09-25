@@ -1,9 +1,10 @@
 State Default
 Font Main
 Size 120 20
-TextPadding 0 -10
+TextPadding 60 10
 TextSize 30
 TextColor 255 255 255 255
+TextOriginCenter
 /State
 State Hover
 TextColor 0 255 200 255

@@ -9,6 +9,7 @@
 #include "state_settings.h"
 #include "state_game.h"
 #include "state_selectlevel.h"
+#include "state_gameover.h"
 
 StateManager::StateManager(SharedContext *l_shared) :
     m_shared(l_shared)
@@ -18,6 +19,7 @@ StateManager::StateManager(SharedContext *l_shared) :
     RegisterState<State_Settings>(StateType::Settings);
     RegisterState<State_Game>(StateType::Game);
     RegisterState<State_SelectLevel>(StateType::SelectLevel);
+    RegisterState<State_GameOver>(StateType::GameOver);
 }
 
 StateManager::~StateManager()

@@ -9,7 +9,7 @@
 #include "texturemanager.h"
 
 
-EnemyManager::EnemyManager(SharedContext* l_context) : m_context(l_context), m_enemyCount(0)
+EnemyManager::EnemyManager(SharedContext* l_context) : m_context(l_context), m_enemyCount(0), m_playing(false)
 {
     LoadConfigFile("enemies.cfg");
     RegisterEnemy<SoldierEnemy>(Enemy::Soldier);
@@ -20,8 +20,10 @@ EnemyManager::~EnemyManager() { Purge(); }
 void EnemyManager::Purge()
 {
     for(auto& itr : m_enemyProporties){
-        m_context->m_textureManager->ReleaseResource(itr.second->m_texture);
-        delete itr.second;
+        for(auto& itr2 : itr.second){
+            m_context->m_textureManager->ReleaseResource(itr2.second->m_texture);
+            delete itr2.second;
+        }
     }
     m_enemyProporties.clear();
     for(auto& itr: m_enemies){
@@ -30,23 +32,28 @@ void EnemyManager::Purge()
     m_enemies.clear();
 }
 
-void EnemyManager::SpawnEnemy(const Enemy &l_enemy, const sf::Vector2f &l_pos, const sf::Vector2f &l_destination)
+void EnemyManager::SpawnEnemy(const Enemy &l_enemy, const EnemyId& l_id, const sf::Vector2f &l_pos, const sf::Vector2f &l_destination)
 {
     auto itr = m_factory.find(l_enemy);
     if(itr == m_factory.end()){
         return;
     }
     auto itr2 = m_enemyProporties.find(l_enemy);
-    if(itr2 == m_enemyProporties.end()){
+    if(itr2 == m_enemyProporties.end() || itr2->second.find(l_id) == itr2->second.end()){
         auto itr3 = m_pathProporties.find(l_enemy);
         if(itr3 == m_pathProporties.end()){
             return;
         }
-        LoadProporties(l_enemy, itr3->second);
+        auto itr4 = itr3->second.find(l_id);
+        if(itr4 == itr3->second.end()){
+            return;
+        }
+        LoadProporties(l_enemy, l_id, itr4->second);
         itr2 = m_enemyProporties.find(l_enemy);
     }
 
-    AbstractEnemy* enemy = itr->second(itr2->second);
+    auto itr5 = itr2->second.find(l_id);
+    AbstractEnemy* enemy = itr->second(itr5->second);
     enemy->SetPosition(l_pos);
     enemy->SetDestination(l_destination);
     enemy->GetProporties()->m_id = m_enemyCount;
@@ -65,15 +72,17 @@ void EnemyManager::LoadConfigFile(const std::string &l_file)
     std::string line;
     while(std::getline(file, line)){
         std::stringstream keystream(line);
-        int key;
+        int key = 0;
+        EnemyId id = 0;
         std::string path;
-        keystream >> key >> path;
-        m_pathProporties.emplace(static_cast<Enemy>(key), path);
+        keystream >> key >> id >> path;
+        auto itr = m_pathProporties.emplace(static_cast<Enemy>(key), std::unordered_map<EnemyId, std::string>()).first;
+        itr->second.emplace(id, path);
     }
     file.close();
 }
 
-void EnemyManager::LoadProporties(const Enemy& l_enemy, const std::string &l_file)
+void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, const std::string &l_file)
 {
     std::ifstream file;
     file.open(Utils::GetEnemiesDirectory() + '\\' + l_file);
@@ -118,7 +127,8 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const std::string &l_fil
     }
     sf::IntRect size = proporties->m_sprite.getTextureRect();
     proporties->m_sprite.setOrigin(sf::Vector2f(size.width / 2.f, size.height / 2.f));
-    m_enemyProporties.emplace(l_enemy, proporties);
+    auto itr = m_enemyProporties.emplace(l_enemy, std::unordered_map<EnemyId, EnemyProporties*>()).first;
+    itr->second.emplace(l_id, proporties);
     file.close();
 }
 
@@ -133,6 +143,9 @@ void EnemyManager::Draw()
 
 void EnemyManager::Update(const float &l_dT)
 {
+    if(!m_playing){
+        return;
+    }
     for(auto& itr : m_enemies){
         itr.second->Update(l_dT);
     }
@@ -151,10 +164,23 @@ void EnemyManager::GiveNextWaypoint(AbstractEnemy *l_enemy)
 
 void EnemyManager::ProcessRequests()
 {
-    while(!m_toRemove.empty()){
-        auto itr = m_enemies.find(m_toRemove.front());
-        delete itr->second;
-        m_enemies.erase(itr);
-        m_toRemove.erase(m_toRemove.begin());
+    if(!m_toRemove.empty()){
+        while(!m_toRemove.empty()){
+            auto itr = m_enemies.find(m_toRemove.front());
+            delete itr->second;
+            m_enemies.erase(itr);
+            m_toRemove.erase(m_toRemove.begin());
+        }
+        if(m_context->m_level->Finished() && m_enemies.empty()){
+            m_context->m_level->Win();
+        }
     }
+}
+
+void EnemyManager::Restart()
+{
+    for(auto& itr: m_enemies){
+        delete itr.second;
+    }
+    m_enemies.clear();
 }

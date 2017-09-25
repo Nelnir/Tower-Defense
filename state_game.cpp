@@ -115,5 +115,11 @@ void State_Game::HandleKey(EventDetails *l_details)
 
 void State_Game::StartGame(EventDetails *l_details)
 {
-    m_level->StartGame();
+    if(!m_level->IsPlaying()){
+        m_level->StartGame();
+        m_enemyManager.Start();
+    } else{
+        m_level->StopGame();
+        m_enemyManager.Stop();
+    }
 }

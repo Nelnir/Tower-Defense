@@ -27,6 +27,7 @@ public:
     bool NeedsContentRedraw() { return m_contentRedraw; }
     bool NeedsControlRedraw() { return m_controlRedraw; }
     void SetContentSize(const sf::Vector2f& l_size) { m_contentSize = l_size; }
+    void SetContentRedraw(const bool& l_redraw) { m_contentRedraw = l_redraw; }
     sf::Vector2f GetContentSize() { return m_contentSize; }
     void UpdateScrollHorizontal(const unsigned int& l_percent);
     void UpdateScrollVertical(const unsigned int& l_percent);

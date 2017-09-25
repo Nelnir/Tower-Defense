@@ -5,6 +5,7 @@
 
 enum class Enemy { Soldier = 0};
 enum class EnemyType { Normal = 0};
+using EnemyId = unsigned int;
 
 struct twoFloats{
     float x, y;

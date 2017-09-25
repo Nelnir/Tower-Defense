@@ -106,6 +106,9 @@ void GUI_Manager::HandleClick(EventDetails* l_details)
         if (!itr->second->IsActive()){
             return;
         }
+        if(itr->second->GetState() == GUI_ElementState::Locked){
+            return;
+        }
         itr->second->OnClick(sf::Vector2f(mousePos));
         itr->second->Focus();
         return;
@@ -205,6 +208,15 @@ void GUI_Manager::Render(sf::RenderWindow* l_wind)
         if (i->NeedsControlRedraw()){ i->RedrawControls(); }
         i->Draw(l_wind);
     }
+}
+
+void GUI_Manager::Render(GUI_Interface* i)
+{
+    if (!i->IsActive()){ return; }
+    if (i->NeedsRedraw()){ i->Redraw(); }
+    if (i->NeedsContentRedraw()){ i->RedrawContent(); }
+    if (i->NeedsControlRedraw()){ i->RedrawControls(); }
+    i->Draw(m_context->m_wind->getRenderWindow());
 }
 
 GUI_Element* GUI_Manager::CreateElement(const GUI_ElementType &l_id, GUI_Interface *l_owner)
