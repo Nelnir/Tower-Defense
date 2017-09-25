@@ -3,6 +3,7 @@
 
 #include "sharedcontext.h"
 #include "abstractenemy.h"
+#include "statistics.h"
 #include <unordered_map>
 #include <functional>
 
@@ -14,7 +15,7 @@ using EnemiesToRemove = std::list<EnemyId>;
 class EnemyManager
 {
 public:
-    EnemyManager(SharedContext* l_shared);
+    EnemyManager(SharedContext* l_shared, Statistics* l_statistics);
     ~EnemyManager();
 
     void SpawnEnemy(const Enemy& l_enemy, const EnemyId& l_id, const sf::Vector2f& l_pos, const sf::Vector2f& l_destination);
@@ -25,8 +26,6 @@ public:
 
     void GiveNextWaypoint(AbstractEnemy* l_enemy);
     void ProcessRequests();
-    void Start() { m_playing = true; }
-    void Stop() { m_playing = false; }
     void Restart();
 private:
     void Purge();
@@ -46,7 +45,8 @@ private:
     EnemyId m_enemyCount;
     std::unordered_map<Enemy, std::unordered_map<EnemyId, std::string>> m_pathProporties;
     EnemiesToRemove m_toRemove;
-    bool m_playing;
+
+    Statistics* m_statistics;
 };
 
 #endif // ENEMYMANAGER_H

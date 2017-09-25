@@ -9,9 +9,9 @@
 #include "abstracttower.h"
 #include "statemanager.h"
 
-Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn) : m_context(l_context),
-    m_maxMapSize(0, 0), m_playing(false), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
-    m_interface(l_interface), m_connections(l_conn), m_previousTime(0)
+Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn, Statistics* l_statistics) : m_context(l_context),
+    m_maxMapSize(0, 0), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
+    m_interface(l_interface), m_connections(l_conn), m_previousTime(0), m_statistics(l_statistics)
 {
     LoadTiles("tiles.cfg");
 }
@@ -35,7 +35,6 @@ void Level::Purge()
     }
     m_tileMap.clear();
     m_waves.clear();
-    m_playing = false;
     m_elapsed = false;
     m_currentWave = 0;
     m_spawnedEnemies = 0;
@@ -215,6 +214,7 @@ void Level::LoadLevel(const std::string &l_file)
         } else if(type == "MONEY"){
             keystream >> m_money;
             m_baseMoney = m_money;
+            m_statistics->AddMoneyEarned(m_money);
         }
     };
     Initialize();
@@ -281,9 +281,6 @@ unsigned int Level::ConvertCoords(const unsigned int &l_x, const unsigned int &l
 
 void Level::Update(const float& l_dT)
 {
-    if(!m_playing){
-        return;
-    }
     m_elapsed += l_dT;
     Wave* current = m_waves[m_currentWave];
     m_elapsedWave -= l_dT;
@@ -350,18 +347,18 @@ sf::Vector2f Level::GetWaypointAfter(int l_waypoint)
     return m_waypoints[l_waypoint + 1];
 }
 
-void Level::SubtractLifes(const int &l_lifes)
+void Level::AddLifes(const int &l_lifes)
 {
-    m_lifes -= l_lifes;
+    m_lifes += l_lifes;
     UpdateLifesGUI();
     if(m_lifes <= 0){
         Lose();
     }
 }
 
-void Level::SubtractMoney(const int &l_money)
+void Level::AddMoney(const int &l_money)
 {
-    m_money -= l_money;
+    m_money += l_money;
     UpdateMoneyGUI();
 }
 
@@ -413,6 +410,9 @@ void Level::NextWave()
 {
     Wave* wave = m_waves[m_currentWave];
     m_money += wave->m_reward;
+
+    m_statistics->AddMoneyEarned(wave->m_reward);
+
     UpdateMoneyGUI();
     ++m_currentWave;
     wave = m_waves[m_currentWave];
@@ -426,13 +426,11 @@ void Level::NextWave()
 
 void Level::StartGame()
 {
-    m_playing = true;
     m_interface->GetElement("Start")->SetText("Pause");
 }
 
 void Level::StopGame()
 {
-    m_playing = false;
     m_interface->GetElement("Start")->SetText("Resume");
 }
 
@@ -457,7 +455,6 @@ bool Level::Finished()
 
 void Level::Restart()
 {
-    m_playing = false;
     Initialize();
     m_interface->GetElement("Start")->SetText("Start");
 }

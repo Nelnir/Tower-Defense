@@ -8,8 +8,8 @@
 #include "level.h"
 #include "towermanager.h"
 
-State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom),
-    m_enemyManager(m_stateMgr->GetContext()){}
+State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom, &m_statistics),
+    m_enemyManager(m_stateMgr->GetContext(), &m_statistics), m_playing(false){}
 
 State_Game::~State_Game()
 {
@@ -27,15 +27,16 @@ void State_Game::OnCreate()
     sf::Vector2f interfaceSize = interface->GetSize();
     interface->SetPosition({windowSize.x - interfaceSize.x, windowSize.y - interfaceSize.y});
 
-    PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(TowerType::Neutral));
+    PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(Tower::Basic));
 
-    m_level = new Level(m_stateMgr->GetContext(), interface, &m_connections);
+    m_level = new Level(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
     m_view.setCenter(1087, 544);
     m_view.zoom(m_zoom);
 
     m_stateMgr->GetContext()->m_towerManager = &m_towerManager;
     m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;
+    m_stateMgr->GetContext()->m_statistics = &m_statistics;
     m_stateMgr->GetContext()->m_level = m_level;
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
@@ -61,10 +62,14 @@ void State_Game::OnDestroy()
 
 void State_Game::Update(const sf::Time &l_time)
 {
+    if(!m_playing){
+        return;
+    }
     m_level->Update(l_time.asSeconds());
     m_towerManager.Update(l_time.asSeconds());
     m_enemyManager.Update(l_time.asSeconds());
     m_enemyManager.ProcessRequests();
+    m_statistics.AddTimePlayed(l_time.asSeconds());
 }
 
 void State_Game::Draw()
@@ -78,7 +83,7 @@ void State_Game::Draw()
 
 void State_Game::Activate()
 {
-
+    m_playing = false; /// When we clicked in game_over state try again, this needs to be set to false to prevent immediatly starting first wave
 }
 
 void State_Game::Deactivate()
@@ -115,11 +120,11 @@ void State_Game::HandleKey(EventDetails *l_details)
 
 void State_Game::StartGame(EventDetails *l_details)
 {
-    if(!m_level->IsPlaying()){
+    if(!m_playing){
+        m_playing = true;
         m_level->StartGame();
-        m_enemyManager.Start();
     } else{
+        m_playing = false;
         m_level->StopGame();
-        m_enemyManager.Stop();
     }
 }

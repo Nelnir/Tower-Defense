@@ -9,7 +9,8 @@
 #include "texturemanager.h"
 
 
-EnemyManager::EnemyManager(SharedContext* l_context) : m_context(l_context), m_enemyCount(0), m_playing(false)
+EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context), m_enemyCount(0),
+    m_statistics(l_statistics)
 {
     LoadConfigFile("enemies.cfg");
     RegisterEnemy<SoldierEnemy>(Enemy::Soldier);
@@ -143,9 +144,6 @@ void EnemyManager::Draw()
 
 void EnemyManager::Update(const float &l_dT)
 {
-    if(!m_playing){
-        return;
-    }
     for(auto& itr : m_enemies){
         itr.second->Update(l_dT);
     }
@@ -157,7 +155,7 @@ void EnemyManager::GiveNextWaypoint(AbstractEnemy *l_enemy)
     if(dest.x != -1 && dest.y != -1){
         l_enemy->SetDestination(dest);
     } else{
-        m_context->m_level->SubtractLifes(l_enemy->m_proporties->m_lifeTakes);
+        m_context->m_level->AddLifes(-l_enemy->m_proporties->m_lifeTakes);
         m_toRemove.emplace_back(l_enemy->m_unique.m_id);
     }
 }
@@ -170,6 +168,7 @@ void EnemyManager::ProcessRequests()
             delete itr->second;
             m_enemies.erase(itr);
             m_toRemove.erase(m_toRemove.begin());
+            m_statistics->AddMonstersKilled();
         }
         if(m_context->m_level->Finished() && m_enemies.empty()){
             m_context->m_level->Win();

@@ -83,7 +83,8 @@ HEADERS += \
     abstractenemy.h \
     enemymanager.h \
     soldierenemy.h \
-    state_gameover.h
+    state_gameover.h \
+    statistics.h
 
 DISTFILES += \
     Data/keys.cfg \

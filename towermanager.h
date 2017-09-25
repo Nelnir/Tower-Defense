@@ -3,11 +3,12 @@
 
 #include "abstracttower.h"
 #include "sharedcontext.h"
+#include "statistics.h"
 #include <unordered_map>
 #include <functional>
 
-using TowerFactory = std::unordered_map<TowerType, std::function<AbstractTower*(TowerProporties*)>>;
-using TowersProporties = std::unordered_map<TowerType, TowerProporties*>;
+using TowerFactory = std::unordered_map<Tower, std::function<AbstractTower*(TowerProporties*)>>;
+using TowersProporties = std::unordered_map<Tower, TowerProporties*>;
 using TowerID = unsigned int;
 using Towers = std::unordered_map<TowerID, AbstractTower*>;
 
@@ -16,9 +17,9 @@ struct EventDetails;
 class TowerManager
 {
 public:
-    TowerManager(SharedContext* l_context, const float& l_zoom);
+    TowerManager(SharedContext* l_context, const float& l_zoom, Statistics* l_statistics);
     ~TowerManager();
-    TowerProporties* GetProporties(const TowerType& l_type);
+    TowerProporties* GetProporties(const Tower& l_type);
     void Pressed(TowerProporties* l_proporties);
     void Draw();
     void Update(const float& l_dT);
@@ -26,7 +27,21 @@ public:
     void HandleRelease(EventDetails* l_details);
     void HandleKey(EventDetails* l_details);
     SharedContext* GetContext() { return m_context; }
+    void Restart();
 private:
+    template<class T>
+    void RegisterTower(const Tower& l_type){
+        m_towerFactory[l_type] = [this] (TowerProporties* l_prop) -> AbstractTower* { return new T(l_prop, this); };
+    }
+    void RegisterProporties(const Tower& l_type, TowerProporties* l_proporties){
+        m_towerProporties[l_type] = l_proporties;
+    }
+    void Purge();
+    TowerProporties* CreateTowerProporties(const Tower& l_type);
+    void SetTextureForProporties(const std::string& l_texture, const sf::IntRect& l_rect, TowerProporties* l_proporties);
+    void AddTower(TowerProporties* l_proporties, const sf::Vector2f& l_pos);
+
+
     SharedContext* m_context;
     TowerFactory m_towerFactory;
     TowersProporties m_towerProporties;
@@ -36,21 +51,7 @@ private:
     TowerProporties* m_placingTower;
     bool m_colliding;
     float m_zoom;
-
-    template<class T>
-    void RegisterTower(const TowerType& l_type){
-        m_towerFactory[l_type] = [this] (TowerProporties* l_prop) -> AbstractTower* { return new T(l_prop, this); };
-    }
-    void RegisterProporties(const TowerType& l_type, TowerProporties* l_proporties){
-        m_towerProporties[l_type] = l_proporties;
-    }
-
-    void Purge();
-
-    TowerProporties* CreateTowerProporties(const TowerType& l_type);
-    void SetTextureForProporties(const std::string& l_texture, const sf::IntRect& l_rect, TowerProporties* l_proporties);
-
-    void AddTower(TowerProporties* l_proporties, const sf::Vector2f& l_pos);
+    Statistics* m_statistics;
 };
 
 #endif // TOWERMANAGER_H

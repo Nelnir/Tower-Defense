@@ -5,6 +5,7 @@
 #include "sharedcontext.h"
 #include "texturemanager.h"
 #include "abstractenemy.h"
+#include "statistics.h"
 
 enum Sheet{Tile_Size = 64, Sheet_Width = 1472, Sheet_Height = 832, Num_Layers = 2};
 using TileID = unsigned int;
@@ -67,7 +68,7 @@ class GUI_Interface;
 class Level
 {
 public:
-    Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_connections);
+    Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_connections, Statistics* l_statistics);
     ~Level();
 
     void StartGame();
@@ -76,7 +77,6 @@ public:
     void Restart();
 
     void Draw(const unsigned int& l_layer);
-    bool IsPlaying() { return m_playing; }
     bool Finished();
 
     void LoadLevel(const std::string& l_file);
@@ -85,8 +85,8 @@ public:
     bool CollideWithPath(const sf::CircleShape& l_circle);
     sf::Vector2f GetWaypointAfter(int l_waypoint);
 
-    void SubtractLifes(const int& l_lifes);
-    void SubtractMoney(const int& l_money);
+    void AddLifes(const int& l_lifes);
+    void AddMoney(const int& l_money);
     void Win();
     void Lose();
 private:
@@ -110,7 +110,6 @@ private:
     int m_currentWave;
     int m_spawnedEnemies;
     Waves m_waves;
-    bool m_playing;
     float m_elapsed; // to spawn enemies
     float m_elapsedWave; // to spawn next wave
     Waypoints m_waypoints;
@@ -122,6 +121,7 @@ private:
 
     GUI_Interface* m_interface;
     Connections* m_connections;
+    Statistics* m_statistics;
 };
 
 #endif // LEVEL_H

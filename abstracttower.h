@@ -15,15 +15,17 @@ struct UpgradeProporties{
 using Upgrades = std::vector<UpgradeProporties>;
 
 enum class AttackStrategy { First, Last };
-enum class TowerType { Neutral };
+enum class Tower { Basic };
+enum class TowerType { Land, Air };
 
-struct TowerProporties{ /// proporties which are the same to all towers of type X
-    TowerProporties() : m_cost(0), m_type(TowerType::Neutral) { }
+struct TowerProporties{ /// proporties which are the same to all towers X
+    TowerProporties() : m_cost(0), m_tower(Tower::Basic) { }
 
     int m_cost;
     Upgrades m_upgrades;
     std::string m_texture;
     sf::Sprite m_sprite;
+    Tower m_tower;
     TowerType m_type;
     float m_radiusCollision;
 };

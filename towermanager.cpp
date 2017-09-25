@@ -7,29 +7,31 @@
 
 #include "normal_tower.h"
 
-TowerManager::TowerManager(SharedContext* l_context, const float& l_zoom) : m_context(l_context), m_countId(0), m_placingTower(nullptr), m_colliding(false),
-    m_zoom(l_zoom)
+TowerManager::TowerManager(SharedContext* l_context, const float& l_zoom, Statistics* l_statistics) : m_context(l_context),
+    m_countId(0), m_placingTower(nullptr), m_colliding(false),
+    m_zoom(l_zoom), m_statistics(l_statistics)
 {
-    RegisterProporties(TowerType::Neutral, CreateTowerProporties(TowerType::Neutral));
-    RegisterTower<Normal_Tower>(TowerType::Neutral);
+    RegisterProporties(Tower::Basic, CreateTowerProporties(Tower::Basic));
+    RegisterTower<Normal_Tower>(Tower::Basic);
 }
 
 TowerManager::~TowerManager() { Purge(); }
 
-TowerProporties* TowerManager::GetProporties(const TowerType &l_type)
+TowerProporties* TowerManager::GetProporties(const Tower &l_type)
 {
     auto itr = m_towerProporties.find(l_type);
     return (itr == m_towerProporties.end() ? nullptr : itr->second);
 }
 
-TowerProporties* TowerManager::CreateTowerProporties(const TowerType &l_type)
+TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
 {
     TowerProporties * proporties = new TowerProporties;
     switch(l_type)
     {
-    case TowerType::Neutral:
+    case Tower::Basic:
         proporties->m_cost = 100;
-        proporties->m_type = TowerType::Neutral;
+        proporties->m_tower = Tower::Basic;
+        proporties->m_type = TowerType::Land;
         proporties->m_radiusCollision = 30.f;
         SetTextureForProporties("Tileset", sf::IntRect(1216, 640, 64, 64), proporties);
         UpgradeProporties upp;
@@ -68,6 +70,10 @@ void TowerManager::Purge()
         itr.second = nullptr;
     }
     m_towerProporties.clear();
+    for(auto& itr : m_towers){
+        delete itr.second;
+    }
+    m_towers.clear();
 }
 
 void TowerManager::Pressed(TowerProporties *l_proporties)
@@ -150,7 +156,7 @@ void TowerManager::HandleRelease(EventDetails *l_details)
         m_placingTower = nullptr;
         return;
     }
-    m_context->m_level->SubtractMoney(m_placingTower->m_cost);
+    m_context->m_level->AddMoney(-m_placingTower->m_cost);
     AddTower(m_placingTower, m_placingTower->m_sprite.getPosition());
     m_placingTower = nullptr;
 }
@@ -164,10 +170,19 @@ void TowerManager::HandleKey(EventDetails* l_details)
 
 void TowerManager::AddTower(TowerProporties *l_proporties, const sf::Vector2f& l_pos)
 {
-    auto itr = m_towerFactory.find(l_proporties->m_type);
+    auto itr = m_towerFactory.find(l_proporties->m_tower);
     if(itr == m_towerFactory.end()){
         return;
     }
     AbstractTower* tower = m_towers.emplace(m_countId++, itr->second(l_proporties)).first->second;
     tower->SetPosition(l_pos);
+    m_statistics->AddTowersPlaced();
+}
+
+void TowerManager::Restart()
+{
+    for(auto& itr : m_towers){
+        delete itr.second;
+    }
+    m_towers.clear();
 }

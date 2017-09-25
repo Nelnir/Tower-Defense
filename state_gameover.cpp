@@ -7,6 +7,7 @@
 #include "gui_manager.h"
 #include "level.h"
 #include "enemymanager.h"
+#include "towermanager.h"
 
 State_GameOver::State_GameOver(StateManager *l_stateManager) : BaseState(l_stateManager) {}
 
@@ -75,6 +76,8 @@ void State_GameOver::TryAgain(EventDetails *l_details)
 {
     m_stateMgr->GetContext()->m_level->Restart();
     m_stateMgr->GetContext()->m_enemyManager->Restart();
+    m_stateMgr->GetContext()->m_towerManager->Restart();
+    m_stateMgr->GetContext()->m_statistics->Reset();
     m_stateMgr->SwitchTo(StateType::Game);
     m_stateMgr->Remove(StateType::GameOver);
 }
