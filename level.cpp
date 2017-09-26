@@ -11,10 +11,7 @@
 
 Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn, Statistics* l_statistics) : m_context(l_context),
     m_maxMapSize(0, 0), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
-    m_interface(l_interface), m_connections(l_conn), m_previousTime(0), m_statistics(l_statistics)
-{
-    LoadTiles("tiles.cfg");
-}
+    m_interface(l_interface), m_connections(l_conn), m_previousTime(0), m_statistics(l_statistics) {}
 
 Level::~Level()
 {
@@ -424,21 +421,11 @@ void Level::NextWave()
     UpdateMonstersToSpawnGUI();
 }
 
-void Level::StartGame()
-{
-    m_interface->GetElement("Start")->SetText("Pause");
-}
-
-void Level::StopGame()
-{
-    m_interface->GetElement("Start")->SetText("Resume");
-}
-
 void Level::Win()
 {
-    if(!m_context->m_stateMgr->HasState(StateType::GameOver)){
-        //m_context->m_stateMgr->SwitchTo(StateType::Win);
-    }
+    m_context->m_settings->SetWin(true);
+    m_context->m_stateMgr->SwitchTo(StateType::GameOver);
+    m_interface->SetContentRedraw(true);
 }
 
 void Level::Lose()

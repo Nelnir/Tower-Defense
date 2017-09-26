@@ -19,12 +19,16 @@ public:
 
 
     void TryAgain(EventDetails* l_details);
+    void ExitToMenu(EventDetails* l_details);
+    void ExitFromGame(EventDetails* l_details);
 private:
     GUI_Interface* m_interface; /// game state interface
-    GUI_Interface* m_lostInterface;
+    GUI_Interface* m_overInterface;
+    GUI_Interface* m_statisticsInterface;
     float m_elapsed;
     float m_tick;
     float m_speed;
+    sf::Vector2f m_destination;
     bool m_moving;
 };
 

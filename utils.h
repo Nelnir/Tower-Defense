@@ -79,6 +79,8 @@ namespace Utils
                 l_text.replace(start, length, l_settings->GetLicense());
             else if(text == "%CREATOR%") {
                 l_text.replace(start, length, l_settings->GetCreator());
+            } else if(text == "%GITHUB%") {
+                l_text.replace(start, length, l_settings->GetGithub());
             }
             else continue;
             end = 1;

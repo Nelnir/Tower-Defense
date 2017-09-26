@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
-enum class Enemy { Soldier = 0};
+enum class Enemy { Soldier = 0, Tank, Plane};
 enum class EnemyType { Normal = 0};
 using EnemyId = unsigned int;
 
@@ -56,6 +56,7 @@ public:
     virtual void Draw(sf::RenderWindow* l_window);
 
     Proporties* GetProporties() { return &m_unique; }
+    EnemyProporties* GetEnemyProporties() { return m_proporties; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_unique.m_position = l_pos; }
     void SetDestination(const sf::Vector2f& l_pos);

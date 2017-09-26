@@ -165,10 +165,13 @@ void EnemyManager::ProcessRequests()
     if(!m_toRemove.empty()){
         while(!m_toRemove.empty()){
             auto itr = m_enemies.find(m_toRemove.front());
+
+            m_statistics->AddEnemiesWithTypeKilled(itr->second->GetEnemyProporties()->m_enemy);
+            m_statistics->AddEnemiesKilled();
+
             delete itr->second;
             m_enemies.erase(itr);
             m_toRemove.erase(m_toRemove.begin());
-            m_statistics->AddMonstersKilled();
         }
         if(m_context->m_level->Finished() && m_enemies.empty()){
             m_context->m_level->Win();

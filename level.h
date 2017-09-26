@@ -71,14 +71,13 @@ public:
     Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_connections, Statistics* l_statistics);
     ~Level();
 
-    void StartGame();
-    void StopGame();
     void NextWave();
     void Restart();
 
     void Draw(const unsigned int& l_layer);
     bool Finished();
 
+    void LoadTiles(const std::string& l_file);
     void LoadLevel(const std::string& l_file);
     void Update(const float& l_dT);
     Tile* GetTile(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
@@ -89,6 +88,7 @@ public:
     void AddMoney(const int& l_money);
     void Win();
     void Lose();
+    GUI_Interface* GetInterface() { return m_interface; }
 private:
     void Initialize();
     void UpdateMoneyGUI();
@@ -98,7 +98,6 @@ private:
     void UpdateWaveTimeGUI();
     void TransformPosition(sf::Vector2f& l_pos, const Direction& l_direction);
     void Purge();
-    void LoadTiles(const std::string& l_file);
     void AddWaypoint(const sf::Vector2i& l_pos);
     unsigned int ConvertCoords(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
     TileMap m_tileMap;

@@ -120,4 +120,10 @@ DISTFILES += \
     Data/Enemies/Soldier2.proporties \
     Data/Interfaces/GameOver.interface \
     Data/Styles/GameOver.style \
-    Data/Styles/lost.style
+    Data/Styles/lost.style \
+    Data/Interfaces/Statistics.interface \
+    Data/Styles/Statistics.style \
+    Data/Interfaces/GameOverWin.interface \
+    Data/Styles/win.style \
+    Data/Styles/GameTextSpeed.style \
+    Data/Styles/AboutText2Clickable.style

@@ -9,7 +9,7 @@
 #include "towermanager.h"
 
 State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom, &m_statistics),
-    m_enemyManager(m_stateMgr->GetContext(), &m_statistics), m_playing(false){}
+    m_enemyManager(m_stateMgr->GetContext(), &m_statistics), m_playing(false), m_speed(1){}
 
 State_Game::~State_Game()
 {
@@ -30,6 +30,7 @@ void State_Game::OnCreate()
     PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(Tower::Basic));
 
     m_level = new Level(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
+    m_level->LoadTiles("tiles.cfg");
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
     m_view.setCenter(1087, 544);
     m_view.zoom(m_zoom);
@@ -45,6 +46,9 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
     eveM->AddCallback(StateType::Game, "Start_Game", &State_Game::StartGame, this);
+    eveM->AddCallback(StateType::Game, "SpeedChange", &State_Game::SpeedChange, this);
+
+    UpdateSpeedGUI();
 }
 
 void State_Game::OnDestroy()
@@ -58,6 +62,7 @@ void State_Game::OnDestroy()
     eveM->RemoveCallback(StateType::Game, "Mouse_Right_Release");
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
     eveM->RemoveCallback(StateType::Game, "Start_Game");
+    eveM->RemoveCallback(StateType::Game, "SpeedChange");
 }
 
 void State_Game::Update(const sf::Time &l_time)
@@ -65,9 +70,9 @@ void State_Game::Update(const sf::Time &l_time)
     if(!m_playing){
         return;
     }
-    m_level->Update(l_time.asSeconds());
-    m_towerManager.Update(l_time.asSeconds());
-    m_enemyManager.Update(l_time.asSeconds());
+    m_level->Update(l_time.asSeconds() * m_speed);
+    m_towerManager.Update(l_time.asSeconds() * m_speed);
+    m_enemyManager.Update(l_time.asSeconds() * m_speed);
     m_enemyManager.ProcessRequests();
     m_statistics.AddTimePlayed(l_time.asSeconds());
 }
@@ -83,6 +88,8 @@ void State_Game::Draw()
 
 void State_Game::Activate()
 {
+    m_speed = 1;
+    UpdateSpeedGUI();
     m_playing = false; /// When we clicked in game_over state try again, this needs to be set to false to prevent immediatly starting first wave
 }
 
@@ -122,9 +129,23 @@ void State_Game::StartGame(EventDetails *l_details)
 {
     if(!m_playing){
         m_playing = true;
-        m_level->StartGame();
+        m_level->GetInterface()->GetElement("Start")->SetText("Pause");
     } else{
         m_playing = false;
-        m_level->StopGame();
+        m_level->GetInterface()->GetElement("Start")->SetText("Resume");
     }
+}
+
+void State_Game::SpeedChange(EventDetails *l_details)
+{
+    m_speed *= 2;
+    if(m_speed > 8 || m_speed <= 0){
+        m_speed = 1;
+    }
+    UpdateSpeedGUI();
+}
+
+void State_Game::UpdateSpeedGUI()
+{
+    m_level->GetInterface()->GetElement("Speed")->SetText("Speed: " + std::to_string(m_speed) + "x");
 }

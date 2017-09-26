@@ -15,8 +15,9 @@ public:
     void Deactivate();
     void Update(const sf::Time &l_time);
     void Draw();
-
+private:
     void MainMenu(EventDetails* l_details);
+    void GitHubClicked(EventDetails* l_details);
 };
 
 #endif // STATE_ABOUT_H

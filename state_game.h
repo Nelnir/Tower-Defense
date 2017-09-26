@@ -29,7 +29,10 @@ public:
     void HandleRelease(EventDetails* l_details);
     void HandleKey(EventDetails* l_details);
     void StartGame(EventDetails* l_details);
+    void SpeedChange(EventDetails* l_details);
 private:
+    inline void UpdateSpeedGUI();
+
     float m_zoom;
     void PrepareElement(GUI_Element* l_element, TowerProporties* l_proporties);
     Statistics m_statistics;
@@ -38,6 +41,7 @@ private:
     EnemyManager m_enemyManager;
     Connections m_connections;
     bool m_playing;
+    unsigned int m_speed;
 };
 
 #endif // STATE_GAME_H

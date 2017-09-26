@@ -1,0 +1,13 @@
+State Default
+Font Main
+Size 774 20
+TextPadding 0 -12
+TextSize 32
+TextColor 10 230 160 255
+/State
+State Hover
+TextColor 124 255 213 255
+/State
+State Clicked
+TextColor 165 255 225 255
+/State
