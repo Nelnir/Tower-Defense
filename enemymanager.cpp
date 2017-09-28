@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "window.h"
 #include "level.h"
+#include "abstracttower.h"
 
 #include "soldierenemy.h"
 #include "texturemanager.h"
@@ -185,4 +186,48 @@ void EnemyManager::Restart()
         delete itr.second;
     }
     m_enemies.clear();
+}
+
+AbstractEnemy* EnemyManager::GetEnemyFor(AbstractTower *l_tower)
+{
+    std::vector<AbstractEnemy*> colliding;
+    for(auto& itr : m_enemies){
+        AbstractEnemy* enemy = itr.second;
+        bool aabb = (static_cast<int>(enemy->GetEnemyProporties()->m_enemy) % 2) == 0;
+        sf::Vector2f enemyPos = enemy->GetProporties()->m_position;
+        if(aabb){ /// aabb circle collision
+            const twoFloats& size = enemy->GetEnemyProporties()->m_size;
+            sf::FloatRect rect(enemyPos.x - size.x / 2.f, enemyPos.y - size.y / 2.f, size.x, size.y);
+            if(Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
+                colliding.push_back(enemy);
+            }
+        } else { /// circle circle collision
+
+        }
+    }
+
+
+    std::sort(colliding.begin(), colliding.end(), [](AbstractEnemy* a, AbstractEnemy* b) -> bool{
+        if(a->m_unique.m_waypoint != b->m_unique.m_waypoint){
+            return a->m_unique.m_waypoint > b->m_unique.m_waypoint;
+        }
+        const sf::Vector2f& posA = a->GetProporties()->m_position;
+        const sf::Vector2f& desA = a->GetProporties()->m_destination;
+        const sf::Vector2f& posB = b->GetProporties()->m_position;
+        const sf::Vector2f& desB = b->GetProporties()->m_destination;
+        const sf::Vector2f diffA(abs(desA.x - posA.x), abs(desA.y - posA.y));
+        const sf::Vector2f diffB(abs(desB.x - posB.x), abs(desB.y - posB.y));
+        if(diffA.x != diffB.x){
+            return diffA.x < diffB.x;
+        } else return diffA.y < diffB.y;
+    });
+
+
+    if(!colliding.empty()){
+        if(l_tower->GetStrategy() == AttackStrategy::First){
+            return colliding.front();
+        } else return colliding.back();
+    }
+
+    return nullptr;
 }

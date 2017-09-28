@@ -6,6 +6,11 @@
 #include "gui_interface.h"
 #include "gui_manager.h"
 
+#ifdef WIN32
+#include <windows.h>
+#include <ShellApi.h>
+#pragma comment(lib, "SHELL32.LIB")
+#endif
 State_About::State_About(StateManager *l_stateManager) : BaseState(l_stateManager) {}
 
 State_About::~State_About()
@@ -20,9 +25,9 @@ void State_About::OnCreate()
     sf::Vector2u windowSize = m_stateMgr->GetContext()->m_wind->GetWindowSize();
 
     guiM->LoadInterface(StateType::About, "About.interface", "AboutInterface");
-    GUI_Interface* interface = guiM->GetInterface(StateType::About, "AboutInterface");
-    sf::Vector2f interfaceSize = interface->GetSize();
-    interface->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
+    GUI_Interface* interfac = guiM->GetInterface(StateType::About, "AboutInterface");
+    sf::Vector2f interfaceSize = interfac->GetSize();
+    interfac->SetPosition({windowSize.x / 2.f - interfaceSize.x / 2.f, windowSize.y / 2.f - interfaceSize.y / 2.f});
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->AddCallback(StateType::About, "About_Back", &State_About::MainMenu, this);
@@ -68,5 +73,7 @@ void State_About::MainMenu(EventDetails *l_details)
 
 void State_About::GitHubClicked(EventDetails *l_details)
 {
-
+#ifdef WIN32
+    ShellExecute(NULL, NULL, L"https://github.com/Nelnir/Tower-Defense", NULL, NULL, SW_SHOW);
+#endif
 }

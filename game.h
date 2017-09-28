@@ -15,12 +15,9 @@ class Game
 public:
     Game();
     ~Game();
-   // void HandleInput();
     void Update();
     void Render();
     inline Window* GetWindow() { return &m_window; }
-  //  inline sf::Time getElapsed() { return m_elapsed; }
-    //inline void restartClock() { elapsed += m_clock.restart().asSeconds(); }
     void RestartClock();
     void LateUpdate();
 private:

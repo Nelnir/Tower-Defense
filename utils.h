@@ -42,6 +42,27 @@ namespace Utils
         return (sqrt(a_square + b_square) <= l_radius + l_radius2);
     }
 
+    template<class T>
+    const T& clamp( const T& v, const T& lo, const T& hi )
+    {
+        if(v < lo) return lo;
+        if(hi < v) return hi;
+        return v;
+    }
+
+    inline bool CircleAABBColliding(const sf::Vector2f& l_circlePos, const float& l_radius, const sf::FloatRect& l_rect){
+        const float closestX = clamp(l_circlePos.x, l_rect.left, l_rect.left + l_rect.width);
+        const float closestY = clamp(l_circlePos.y, l_rect.top, l_rect.top + l_rect.height);
+
+        // Calculate the distance between the circle's center and this closest point
+        const float distanceX = l_circlePos.x - closestX;
+        const float distanceY = l_circlePos.y - closestY;
+
+        // If the distance is less than the circle's radius, an intersection occurs
+        const float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+        return distanceSquared < (l_radius * l_radius);
+    }
+
     inline void ReadQuotedString(std::stringstream& l_stream, std::string& l_string) {
         l_stream >> l_string;
         if (l_string.at(0) == '"'){

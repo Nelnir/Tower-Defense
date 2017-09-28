@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
-enum class Enemy { Soldier = 0, Tank, Plane};
+enum class Enemy { Soldier = 0, Tank = 2, Plane = 4}; // if %2 is equal to 0, then it's AABB collision otherwise circle
 enum class EnemyType { Normal = 0};
 using EnemyId = unsigned int;
 
@@ -33,7 +33,7 @@ struct Proporties{
     float m_speed;
     int m_hp;
     sf::Vector2f m_position;
-    sf::Vector2f m_destionation;
+    sf::Vector2f m_destination;
     MoveDirection m_direction;
     int m_waypoint;
     int m_id;

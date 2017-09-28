@@ -29,7 +29,7 @@ void State_Game::OnCreate()
 
     PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(Tower::Basic));
 
-    m_level = new Level(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
+    m_level = std::make_unique<Level>(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
     m_level->LoadTiles("tiles.cfg");
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
     m_view.setCenter(1087, 544);
@@ -38,7 +38,7 @@ void State_Game::OnCreate()
     m_stateMgr->GetContext()->m_towerManager = &m_towerManager;
     m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;
     m_stateMgr->GetContext()->m_statistics = &m_statistics;
-    m_stateMgr->GetContext()->m_level = m_level;
+    m_stateMgr->GetContext()->m_level = m_level.get();
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->AddCallback(StateType::Game, "Tower1", &State_Game::TowerPressed, this);

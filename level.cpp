@@ -295,14 +295,6 @@ void Level::Update(const float& l_dT)
     }
 }
 
-template<class T>
-const T& clamp( const T& v, const T& lo, const T& hi )
-{
-    if(v < lo) return lo;
-    if(hi < v) return hi;
-    return v;
-}
-
 bool Level::CollideWithPath(const sf::CircleShape &l_circle)
 {
     sf::Vector2f pos = l_circle.getPosition();
@@ -315,21 +307,11 @@ bool Level::CollideWithPath(const sf::CircleShape &l_circle)
                 Tile* tile = GetTile(x, y, layer);
                 if(!tile) { continue; }
                 if(tile->m_towerPlaceable && !tile->m_proporties->m_ornament) { continue; }
-               /* if(l_circle.getGlobalBounds().intersects(sf::FloatRect(x * Sheet::Tile_Size, y * Sheet::Tile_Size, Sheet::Tile_Size, Sheet::Tile_Size))){
+
+                sf::FloatRect rect(float(x * Sheet::Tile_Size), float(y * Sheet::Tile_Size), float(Sheet::Tile_Size), float(Sheet::Tile_Size));
+                if(Utils::CircleAABBColliding(pos, radius, rect)){
                     return true;
-
-                }*/
-                const float closestX = clamp(pos.x, float(x * Sheet::Tile_Size), float((x + 1) * Sheet::Tile_Size));
-                const float closestY = clamp(pos.y, float(y * Sheet::Tile_Size), float((y + 1) * Sheet::Tile_Size));
-
-                // Calculate the distance between the circle's center and this closest point
-                const float distanceX = pos.x - closestX;
-                const float distanceY = pos.y - closestY;
-
-                // If the distance is less than the circle's radius, an intersection occurs
-                const float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-                if(distanceSquared < (radius * radius))
-                    return true;
+                }
             }
         }
     }

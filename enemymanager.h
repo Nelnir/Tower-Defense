@@ -12,6 +12,7 @@ using EnemyFactory = std::unordered_map<Enemy, std::function<AbstractEnemy*(Enem
 using EnemiesProporties = std::unordered_map<Enemy, std::unordered_map<EnemyId, EnemyProporties*>>;
 using EnemiesToRemove = std::list<EnemyId>;
 
+class AbstractTower;
 class EnemyManager
 {
 public:
@@ -27,6 +28,7 @@ public:
     void GiveNextWaypoint(AbstractEnemy* l_enemy);
     void ProcessRequests();
     void Restart();
+    AbstractEnemy* GetEnemyFor(AbstractTower* l_tower);
 private:
     void Purge();
     void LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, const std::string& l_file);

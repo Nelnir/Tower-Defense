@@ -28,6 +28,7 @@ struct TowerProporties{ /// proporties which are the same to all towers X
     Tower m_tower;
     TowerType m_type;
     float m_radiusCollision;
+    bool m_towerRotation;
 };
 
 class TowerManager;
@@ -36,25 +37,30 @@ class AbstractTower
 {
     friend class TowerManager;
 public:
-    AbstractTower(TowerProporties* l_proporties, TowerManager* l_towerManager) : m_proporties(l_proporties), m_towerManager(l_towerManager) {}
+    AbstractTower(TowerProporties* l_proporties, TowerManager* l_towerManager);
 
     virtual void Draw(sf::RenderWindow* l_wind) = 0;
-    virtual void Update(const float& l_dT, AbstractEnemy* l_lookinAt) = 0;
+    virtual void Update(const float& l_dT) = 0;
 
+    UpgradeProporties& GetUpgradeProporties() { return m_proporties->m_upgrades[m_currentUpgrade]; }
     TowerProporties* GetProporties() { return m_proporties; }
     AttackStrategy GetStrategy() { return m_strategy; }
     sf::Vector2f GetPosition() { return m_position; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_position = l_pos; }
+    void SetEnemy(AbstractEnemy* l_enemy) { m_lookinAt = l_enemy; }
 protected:
-    virtual void Shot(AbstractEnemy* l_enemy) = 0;
+    virtual void Shot() = 0;
+    void RotateToEnemy(AbstractEnemy* l_enemy);
+    TowerProporties* m_proporties;
+    TowerManager* m_towerManager;
 
+    AbstractEnemy* m_lookinAt;
     unsigned int m_currentUpgrade;
     AttackStrategy m_strategy;
-    TowerProporties* m_proporties;
     sf::Vector2f m_position;
+    float m_angle;
 
-    TowerManager* m_towerManager;
 };
 
 #endif // ABSTRACTTOWER_H

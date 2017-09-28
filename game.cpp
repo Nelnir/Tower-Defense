@@ -12,8 +12,8 @@ Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution(), false
     m_context.m_settings = &m_settings;
     m_context.m_stateMgr = &m_stateManager;
 
-    m_stateManager.SwitchTo(StateType::MainMenu);
-  //  m_stateManager.SwitchTo(StateType::Game);
+   // m_stateManager.SwitchTo(StateType::MainMenu);
+    m_stateManager.SwitchTo(StateType::Game);
 }
 
 Game::~Game()

@@ -45,7 +45,8 @@ SOURCES += main.cpp \
     abstractenemy.cpp \
     enemymanager.cpp \
     soldierenemy.cpp \
-    state_gameover.cpp
+    state_gameover.cpp \
+    abstracttower.cpp
 
 HEADERS += \
     window.h \

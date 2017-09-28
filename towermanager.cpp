@@ -4,6 +4,7 @@
 #include "window.h"
 #include "level.h"
 #include "utils.h"
+#include "enemymanager.h"
 
 #include "normal_tower.h"
 
@@ -33,6 +34,7 @@ TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
         proporties->m_tower = Tower::Basic;
         proporties->m_type = TowerType::Land;
         proporties->m_radiusCollision = 30.f;
+        proporties->m_towerRotation = true;
         SetTextureForProporties("Tileset", sf::IntRect(1216, 640, 64, 64), proporties);
         UpgradeProporties upp;
         upp.m_cost = 0;
@@ -85,7 +87,9 @@ void TowerManager::Draw()
 {
     sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
     for(auto& itr : m_towers){
-        itr.second->Draw(window);
+        AbstractTower* tower = itr.second;
+        tower->GetProporties()->m_sprite.setPosition(tower->GetPosition());
+        tower->Draw(window);
     }
 
     if(m_placingTower){
@@ -133,6 +137,7 @@ void TowerManager::Draw()
 
         /// draw current placing tower sprite
         m_placingTower->m_sprite.setPosition(sf::Vector2f(mousePos.x * m_zoom, mousePos.y * m_zoom));
+        m_placingTower->m_sprite.setRotation(0);
         window->draw(m_placingTower->m_sprite);
     }
 }
@@ -140,7 +145,8 @@ void TowerManager::Draw()
 void TowerManager::Update(const float& l_dT)
 {
     for(auto& itr : m_towers){
-        itr.second->Update(l_dT, nullptr);
+        itr.second->Update(l_dT);
+        itr.second->SetEnemy(m_context->m_enemyManager->GetEnemyFor(itr.second));
     }
 }
 
