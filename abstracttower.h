@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "bullet.h"
 
 struct UpgradeProporties{
     int m_damage;
@@ -10,6 +11,7 @@ struct UpgradeProporties{
     float m_radius; /// range
     unsigned int m_shoots; /// multiple shots maybe?
     unsigned int m_cost; /// cost to upgrade to this lvl
+    float m_bulletSpeed; /// seconds to hit the enemy
 };
 
 using Upgrades = std::vector<UpgradeProporties>;
@@ -29,10 +31,11 @@ struct TowerProporties{ /// proporties which are the same to all towers X
     TowerType m_type;
     float m_radiusCollision;
     bool m_towerRotation;
+    BulletType m_bulletType;
 };
 
 class TowerManager;
-class AbstractEnemy;
+class EnemyBase;
 class AbstractTower
 {
     friend class TowerManager;
@@ -48,19 +51,20 @@ public:
     sf::Vector2f GetPosition() { return m_position; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_position = l_pos; }
-    void SetEnemy(AbstractEnemy* l_enemy) { m_lookinAt = l_enemy; }
+    void SetEnemy(const std::shared_ptr<EnemyBase>& l_enemy){ if(m_lookinAt != l_enemy) m_lookinAt = l_enemy; }
 protected:
-    virtual void Shot() = 0;
-    void RotateToEnemy(AbstractEnemy* l_enemy);
+    virtual void Shot(const std::shared_ptr<EnemyBase>& l_enemy) = 0;
+    void RotateToEnemy(const std::shared_ptr<EnemyBase>& l_enemy);
     TowerProporties* m_proporties;
     TowerManager* m_towerManager;
 
-    AbstractEnemy* m_lookinAt;
+    std::shared_ptr<EnemyBase> m_lookinAt;
     unsigned int m_currentUpgrade;
     AttackStrategy m_strategy;
     sf::Vector2f m_position;
     float m_angle;
-
+private:
+    float m_shootElapsed;
 };
 
 #endif // ABSTRACTTOWER_H

@@ -7,6 +7,7 @@
 #include "towermanager.h"
 #include "enemymanager.h"
 #include "statistics.h"
+#include "bulletmanager.h"
 #include <memory>
 
 using Connections = std::unordered_map<std::string, TowerProporties*>;
@@ -40,6 +41,7 @@ private:
     std::unique_ptr<Level> m_level;
     TowerManager m_towerManager;
     EnemyManager m_enemyManager;
+    BulletManager m_bulletManager;
     Connections m_connections;
     bool m_playing;
     unsigned int m_speed;

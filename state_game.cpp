@@ -8,8 +8,14 @@
 #include "level.h"
 #include "towermanager.h"
 
-State_Game::State_Game(StateManager *l_stateManager) : BaseState(l_stateManager), m_zoom(1.5), m_towerManager(m_stateMgr->GetContext(), m_zoom, &m_statistics),
-    m_enemyManager(m_stateMgr->GetContext(), &m_statistics), m_playing(false), m_speed(1){}
+State_Game::State_Game(StateManager *l_stateManager) :
+    BaseState(l_stateManager),
+    m_zoom(1.5),
+    m_towerManager(m_stateMgr->GetContext(), m_zoom, &m_statistics),
+    m_enemyManager(m_stateMgr->GetContext(), &m_statistics),
+    m_bulletManager(m_stateMgr->GetContext()),
+    m_playing(false),
+    m_speed(1){}
 
 State_Game::~State_Game()
 {
@@ -39,6 +45,7 @@ void State_Game::OnCreate()
     m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;
     m_stateMgr->GetContext()->m_statistics = &m_statistics;
     m_stateMgr->GetContext()->m_level = m_level.get();
+    m_stateMgr->GetContext()->m_bulletManager = &m_bulletManager;
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->AddCallback(StateType::Game, "Tower1", &State_Game::TowerPressed, this);
@@ -72,6 +79,8 @@ void State_Game::Update(const sf::Time &l_time)
     }
     m_level->Update(l_time.asSeconds() * m_speed);
     m_towerManager.Update(l_time.asSeconds() * m_speed);
+    m_bulletManager.Update(l_time.asSeconds() * m_speed);
+    m_bulletManager.ProcessRequests();
     m_enemyManager.Update(l_time.asSeconds() * m_speed);
     m_enemyManager.ProcessRequests();
     m_statistics.AddTimePlayed(l_time.asSeconds());
@@ -84,6 +93,7 @@ void State_Game::Draw()
     }
     m_towerManager.Draw();
     m_enemyManager.Draw();
+    m_bulletManager.Draw();
 }
 
 void State_Game::Activate()

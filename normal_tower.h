@@ -10,7 +10,7 @@ public:
     void Draw(sf::RenderWindow* l_wind);
     void Update(const float &l_dT);
 protected:
-    void Shot();
+    void Shot(const std::shared_ptr<EnemyBase>& l_enemy);
 };
 
 #endif // NORMAL_TOWER_H

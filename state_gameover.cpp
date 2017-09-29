@@ -8,6 +8,7 @@
 #include "level.h"
 #include "enemymanager.h"
 #include "towermanager.h"
+#include "bulletmanager.h"
 
 State_GameOver::State_GameOver(StateManager *l_stateManager) : BaseState(l_stateManager) {}
 
@@ -101,6 +102,7 @@ void State_GameOver::Deactivate()
 
 void State_GameOver::TryAgain(EventDetails *l_details)
 {
+    m_stateMgr->GetContext()->m_bulletManager->Purge();
     m_stateMgr->GetContext()->m_level->Restart();
     m_stateMgr->GetContext()->m_enemyManager->Restart();
     m_stateMgr->GetContext()->m_towerManager->Restart();

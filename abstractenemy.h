@@ -2,6 +2,7 @@
 #define ABSTRACTENEMY_H
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 enum class Enemy { Soldier = 0, Tank = 2, Plane = 4}; // if %2 is equal to 0, then it's AABB collision otherwise circle
 enum class EnemyType { Normal = 0};
@@ -36,24 +37,24 @@ struct Proporties{
     sf::Vector2f m_destination;
     MoveDirection m_direction;
     int m_waypoint;
-    int m_id;
 };
 
+class Bullet;
 class EnemyManager;
-class AbstractEnemy
+class EnemyBase
 {
     friend class EnemyManager;
 public:
-    AbstractEnemy(EnemyProporties* l_proporties, EnemyManager* l_mgr) : m_enemyManager(l_mgr){
+    EnemyBase(EnemyProporties* l_proporties, EnemyManager* l_mgr) : m_enemyManager(l_mgr){
         m_proporties = l_proporties;
         m_unique.m_hp = l_proporties->m_baseHp;
         m_unique.m_speed = l_proporties->m_baseSpeed;
     }
-    virtual ~AbstractEnemy() {}
+    virtual ~EnemyBase();
 
     virtual void Update(const float& l_dT);
-
     virtual void Draw(sf::RenderWindow* l_window);
+    virtual void OnBulletHit(Bullet* l_bullet);
 
     Proporties* GetProporties() { return &m_unique; }
     EnemyProporties* GetEnemyProporties() { return m_proporties; }
@@ -61,6 +62,7 @@ public:
     void SetPosition(const sf::Vector2f& l_pos) { m_unique.m_position = l_pos; }
     void SetDestination(const sf::Vector2f& l_pos);
 
+    sf::Vector2f GetPositionAfter(const float& l_time, const bool& recurrency = false);
 protected:
     EnemyManager* m_enemyManager;
     EnemyProporties* m_proporties;

@@ -6,11 +6,12 @@
 #include "statistics.h"
 #include <unordered_map>
 #include <functional>
+#include <memory>
 
-using Enemies = std::unordered_map<EnemyId, AbstractEnemy*>;
-using EnemyFactory = std::unordered_map<Enemy, std::function<AbstractEnemy*(EnemyProporties*)>>;
+using Enemies = std::vector<std::shared_ptr<EnemyBase>>;
+using EnemyFactory = std::unordered_map<Enemy, std::function<EnemyBase*(EnemyProporties*)>>;
 using EnemiesProporties = std::unordered_map<Enemy, std::unordered_map<EnemyId, EnemyProporties*>>;
-using EnemiesToRemove = std::list<EnemyId>;
+using EnemiesToRemove = std::vector<std::shared_ptr<EnemyBase>>;
 
 class AbstractTower;
 class EnemyManager
@@ -25,17 +26,22 @@ public:
     void Draw();
     void Update(const float& l_dT);
 
-    void GiveNextWaypoint(AbstractEnemy* l_enemy);
+    sf::Vector2f GiveNextWaypoint(EnemyBase* l_enemy);
     void ProcessRequests();
     void Restart();
-    AbstractEnemy* GetEnemyFor(AbstractTower* l_tower);
+    std::shared_ptr<EnemyBase> GetEnemyFor(AbstractTower* l_tower);
+    void RemoveEnemy(EnemyBase* l_enemy){
+        m_toRemove.push_back(*std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](std::shared_ptr<EnemyBase>& a) { return a.get() == l_enemy; }));
+    }
+
 private:
+    void Sort();
     void Purge();
     void LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, const std::string& l_file);
     void LoadConfigFile(const std::string& l_file);
     template<class T>
     void RegisterEnemy(const Enemy& l_type){
-        m_factory[l_type] = [this](EnemyProporties* l_proporties) -> AbstractEnemy* {
+        m_factory[l_type] = [this](EnemyProporties* l_proporties) -> EnemyBase* {
             return new T(l_proporties, this);
         };
     }
@@ -44,7 +50,6 @@ private:
     EnemyFactory m_factory;
     Enemies m_enemies;
     EnemiesProporties m_enemyProporties;
-    EnemyId m_enemyCount;
     std::unordered_map<Enemy, std::unordered_map<EnemyId, std::string>> m_pathProporties;
     EnemiesToRemove m_toRemove;
 

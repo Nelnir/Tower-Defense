@@ -44,9 +44,10 @@ SOURCES += main.cpp \
     normal_tower.cpp \
     abstractenemy.cpp \
     enemymanager.cpp \
-    soldierenemy.cpp \
     state_gameover.cpp \
-    abstracttower.cpp
+    abstracttower.cpp \
+    bulletmanager.cpp \
+    bullet.cpp
 
 HEADERS += \
     window.h \
@@ -83,9 +84,10 @@ HEADERS += \
     normal_tower.h \
     abstractenemy.h \
     enemymanager.h \
-    soldierenemy.h \
     state_gameover.h \
-    statistics.h
+    statistics.h \
+    bulletmanager.h \
+    bullet.h
 
 DISTFILES += \
     Data/keys.cfg \

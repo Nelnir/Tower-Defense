@@ -13,10 +13,11 @@ class TowerManager;
 class EnemyManager;
 class StateManager;
 class Statistics;
+class BulletManager;
 
 struct SharedContext{
     SharedContext():m_wind(nullptr),m_eventManager(nullptr), m_textureManager(nullptr), m_fontManager(nullptr), m_guiManager(nullptr), m_level(nullptr),
-    m_towerManager(nullptr), m_enemyManager(nullptr), m_stateMgr(nullptr), m_statistics(nullptr) {}
+    m_towerManager(nullptr), m_enemyManager(nullptr), m_stateMgr(nullptr), m_statistics(nullptr), m_bulletManager(nullptr) {}
     Window* m_wind;
     EventManager* m_eventManager;
     TextureManager* m_textureManager;
@@ -28,6 +29,7 @@ struct SharedContext{
     EnemyManager* m_enemyManager;
     StateManager* m_stateMgr;
     Statistics* m_statistics;
+    BulletManager* m_bulletManager;
 };
 
 #endif // SHAREDCONTEXT_H

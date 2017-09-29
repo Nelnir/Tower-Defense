@@ -6,15 +6,14 @@
 #include "level.h"
 #include "abstracttower.h"
 
-#include "soldierenemy.h"
 #include "texturemanager.h"
 
 
-EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context), m_enemyCount(0),
+EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
     m_statistics(l_statistics)
 {
     LoadConfigFile("enemies.cfg");
-    RegisterEnemy<SoldierEnemy>(Enemy::Soldier);
+    RegisterEnemy<EnemyBase>(Enemy::Soldier);
 }
 
 EnemyManager::~EnemyManager() { Purge(); }
@@ -28,9 +27,6 @@ void EnemyManager::Purge()
         }
     }
     m_enemyProporties.clear();
-    for(auto& itr: m_enemies){
-        delete itr.second;
-    }
     m_enemies.clear();
 }
 
@@ -55,11 +51,9 @@ void EnemyManager::SpawnEnemy(const Enemy &l_enemy, const EnemyId& l_id, const s
     }
 
     auto itr5 = itr2->second.find(l_id);
-    AbstractEnemy* enemy = itr->second(itr5->second);
-    enemy->SetPosition(l_pos);
-    enemy->SetDestination(l_destination);
-    enemy->GetProporties()->m_id = m_enemyCount;
-    m_enemies.emplace(m_enemyCount++, enemy);
+    m_enemies.emplace_back(std::make_shared<EnemyBase>(*itr->second(itr5->second)));
+    m_enemies.back()->SetPosition(l_pos);
+    m_enemies.back()->SetDestination(l_destination);
 }
 
 void EnemyManager::LoadConfigFile(const std::string &l_file)
@@ -139,40 +133,39 @@ void EnemyManager::Draw()
 {
     sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
     for(auto& itr : m_enemies){
-        itr.second->Draw(window);
+        itr->Draw(window);
     }
 }
 
 void EnemyManager::Update(const float &l_dT)
 {
     for(auto& itr : m_enemies){
-        itr.second->Update(l_dT);
+        itr->Update(l_dT);
     }
+    Sort();
 }
 
-void EnemyManager::GiveNextWaypoint(AbstractEnemy *l_enemy)
+sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
 {
     sf::Vector2f dest = m_context->m_level->GetWaypointAfter(l_enemy->m_unique.m_waypoint);
-    if(dest.x != -1 && dest.y != -1){
-        l_enemy->SetDestination(dest);
-    } else{
+    if(dest.x == -1 && dest.y == -1){
         m_context->m_level->AddLifes(-l_enemy->m_proporties->m_lifeTakes);
-        m_toRemove.emplace_back(l_enemy->m_unique.m_id);
+        m_toRemove.push_back(std::make_shared<EnemyBase>(*l_enemy));
     }
+    return dest;
 }
 
 void EnemyManager::ProcessRequests()
 {
     if(!m_toRemove.empty()){
         while(!m_toRemove.empty()){
-            auto itr = m_enemies.find(m_toRemove.front());
 
-            m_statistics->AddEnemiesWithTypeKilled(itr->second->GetEnemyProporties()->m_enemy);
+            m_statistics->AddEnemiesWithTypeKilled(m_toRemove.back()->GetEnemyProporties()->m_enemy);
             m_statistics->AddEnemiesKilled();
 
-            delete itr->second;
-            m_enemies.erase(itr);
-            m_toRemove.erase(m_toRemove.begin());
+            m_enemies.erase(std::find(m_enemies.begin(), m_enemies.end(), m_toRemove.back()));
+
+            m_toRemove.pop_back();
         }
         if(m_context->m_level->Finished() && m_enemies.empty()){
             m_context->m_level->Win();
@@ -182,32 +175,12 @@ void EnemyManager::ProcessRequests()
 
 void EnemyManager::Restart()
 {
-    for(auto& itr: m_enemies){
-        delete itr.second;
-    }
     m_enemies.clear();
 }
 
-AbstractEnemy* EnemyManager::GetEnemyFor(AbstractTower *l_tower)
+void EnemyManager::Sort()
 {
-    std::vector<AbstractEnemy*> colliding;
-    for(auto& itr : m_enemies){
-        AbstractEnemy* enemy = itr.second;
-        bool aabb = (static_cast<int>(enemy->GetEnemyProporties()->m_enemy) % 2) == 0;
-        sf::Vector2f enemyPos = enemy->GetProporties()->m_position;
-        if(aabb){ /// aabb circle collision
-            const twoFloats& size = enemy->GetEnemyProporties()->m_size;
-            sf::FloatRect rect(enemyPos.x - size.x / 2.f, enemyPos.y - size.y / 2.f, size.x, size.y);
-            if(Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
-                colliding.push_back(enemy);
-            }
-        } else { /// circle circle collision
-
-        }
-    }
-
-
-    std::sort(colliding.begin(), colliding.end(), [](AbstractEnemy* a, AbstractEnemy* b) -> bool{
+    std::sort(m_enemies.begin(), m_enemies.end(), [](std::shared_ptr<EnemyBase>& a, std::shared_ptr<EnemyBase>& b) -> bool{
         if(a->m_unique.m_waypoint != b->m_unique.m_waypoint){
             return a->m_unique.m_waypoint > b->m_unique.m_waypoint;
         }
@@ -221,13 +194,29 @@ AbstractEnemy* EnemyManager::GetEnemyFor(AbstractTower *l_tower)
             return diffA.x < diffB.x;
         } else return diffA.y < diffB.y;
     });
+}
 
+std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(AbstractTower *l_tower)
+{
+    std::shared_ptr<EnemyBase> previous;
+    for(auto& itr : m_enemies){
+        bool aabb = (static_cast<int>(itr->GetEnemyProporties()->m_enemy) % 2) == 0;
+        sf::Vector2f enemyPos = itr->GetProporties()->m_position;
+        if(aabb){ /// aabb circle collision
+            const twoFloats& size = itr->GetEnemyProporties()->m_size;
+            sf::FloatRect rect(enemyPos.x - size.x / 2.f, enemyPos.y - size.y / 2.f, size.x, size.y);
+            if(Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
+                if(l_tower->GetStrategy() == AttackStrategy::First && !previous){
+                    return itr;
+                }
+                previous = itr;
+            } else if(previous){
+                return previous;
+            }
+        } else { /// circle circle collision
 
-    if(!colliding.empty()){
-        if(l_tower->GetStrategy() == AttackStrategy::First){
-            return colliding.front();
-        } else return colliding.back();
+        }
     }
 
-    return nullptr;
+    return previous;
 }

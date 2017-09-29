@@ -33,15 +33,17 @@ TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
         proporties->m_cost = 100;
         proporties->m_tower = Tower::Basic;
         proporties->m_type = TowerType::Land;
+        proporties->m_bulletType = BulletType::Normal;
         proporties->m_radiusCollision = 30.f;
         proporties->m_towerRotation = true;
         SetTextureForProporties("Tileset", sf::IntRect(1216, 640, 64, 64), proporties);
         UpgradeProporties upp;
         upp.m_cost = 0;
-        upp.m_damage = 10;
-        upp.m_firingRate = 1;
-        upp.m_radius = 125;
+        upp.m_damage = 25;
+        upp.m_firingRate = 5;
+        upp.m_radius = 1205.f;
         upp.m_shoots = 1;
+        upp.m_bulletSpeed = 1250.f;
         proporties->m_upgrades.emplace_back(upp);
         break;
     default:
@@ -59,8 +61,7 @@ void TowerManager::SetTextureForProporties(const std::string &l_texture, const s
     l_proporties->m_texture = l_texture;
     l_proporties->m_sprite.setTexture(*mgr->GetResource(l_texture));
     l_proporties->m_sprite.setTextureRect(l_rect);
-    const sf::IntRect& size = l_proporties->m_sprite.getTextureRect();
-    l_proporties->m_sprite.setOrigin(sf::Vector2f(size.width / 2.f, size.height / 2.f));
+    l_proporties->m_sprite.setOrigin(sf::Vector2f(l_rect.width / 2.f, l_rect.height / 2.f));
 }
 
 void TowerManager::Purge()
@@ -145,8 +146,14 @@ void TowerManager::Draw()
 void TowerManager::Update(const float& l_dT)
 {
     for(auto& itr : m_towers){
-        itr.second->Update(l_dT);
-        itr.second->SetEnemy(m_context->m_enemyManager->GetEnemyFor(itr.second));
+        AbstractTower* tower = itr.second;
+        tower->Update(l_dT);
+        tower->SetEnemy(m_context->m_enemyManager->GetEnemyFor(itr.second));
+        tower->m_shootElapsed += l_dT;
+        if(tower->m_lookinAt && tower->m_shootElapsed >= 1.f / tower->GetUpgradeProporties().m_firingRate){
+            tower->m_shootElapsed = 0.f;
+            tower->Shot(tower->m_lookinAt);
+        }
     }
 }
 

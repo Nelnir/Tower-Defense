@@ -7,9 +7,10 @@ AbstractTower::AbstractTower(TowerProporties *l_proporties, TowerManager *l_towe
     m_lookinAt(nullptr),
     m_currentUpgrade(0),
     m_strategy(AttackStrategy::First),
-    m_angle(0.f) { }
+    m_angle(0.f),
+    m_shootElapsed(0.f) { }
 
-void AbstractTower::RotateToEnemy(AbstractEnemy* l_enemy)
+void AbstractTower::RotateToEnemy(const std::shared_ptr<EnemyBase>& l_enemy)
 {
     if(m_proporties->m_towerRotation && m_lookinAt){
         sf::Vector2f pos = l_enemy->GetProporties()->m_position;
