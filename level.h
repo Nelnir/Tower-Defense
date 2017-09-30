@@ -89,6 +89,8 @@ public:
     void Win();
     void Lose();
     GUI_Interface* GetInterface() { return m_interface; }
+    float GetZoom() { return m_zoom; }
+    sf::Vector2f GetCenter() { return m_center; }
 private:
     void Initialize();
     void UpdateMoneyGUI();
@@ -102,6 +104,8 @@ private:
     unsigned int ConvertCoords(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
     TileMap m_tileMap;
     TileSet m_tileSet;
+    float m_zoom;
+    sf::Vector2f m_center;
 
     SharedContext* m_context;
     sf::Vector2u m_maxMapSize;

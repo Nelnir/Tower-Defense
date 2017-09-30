@@ -10,8 +10,7 @@
 
 State_Game::State_Game(StateManager *l_stateManager) :
     BaseState(l_stateManager),
-    m_zoom(1.5),
-    m_towerManager(m_stateMgr->GetContext(), m_zoom, &m_statistics),
+    m_towerManager(m_stateMgr->GetContext(), &m_statistics),
     m_enemyManager(m_stateMgr->GetContext(), &m_statistics),
     m_bulletManager(m_stateMgr->GetContext()),
     m_playing(false),
@@ -38,8 +37,9 @@ void State_Game::OnCreate()
     m_level = std::make_unique<Level>(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
     m_level->LoadTiles("tiles.cfg");
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
-    m_view.setCenter(1087, 544);
-    m_view.zoom(m_zoom);
+    m_view.setCenter(m_level->GetCenter());
+    m_view.zoom(m_level->GetZoom());
+    m_towerManager.SetZoom(m_level->GetZoom());
 
     m_stateMgr->GetContext()->m_towerManager = &m_towerManager;
     m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;

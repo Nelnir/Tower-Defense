@@ -35,7 +35,6 @@ public:
 private:
     inline void UpdateSpeedGUI();
 
-    float m_zoom;
     void PrepareElement(GUI_Element* l_element, TowerProporties* l_proporties);
     Statistics m_statistics;
     std::unique_ptr<Level> m_level;

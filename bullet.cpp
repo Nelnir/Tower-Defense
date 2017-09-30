@@ -33,17 +33,17 @@ void Bullet::Update(const float &l_dT)
 void Bullet::Initialize(AbstractTower* l_tower)
 {
     if(l_tower){
-        sf::Vector2f pos = m_unique.m_enemy->GetProporties()->m_position;
-        m_unique.m_tick = pos - l_tower->GetPosition();
+        sf::Vector2f enemyPos = m_unique.m_enemy->GetProporties()->m_position;
+        m_unique.m_position = l_tower->GetPosition();
+        m_unique.m_tick = enemyPos - m_unique.m_position;
         float seconds = abs((m_unique.m_tick.x > m_unique.m_tick.y ? m_unique.m_tick.x : m_unique.m_tick.y ) / l_tower->GetUpgradeProporties().m_bulletSpeed);
 
-        pos = m_unique.m_enemy->GetPositionAfter(seconds);
-        m_unique.m_tick = pos - l_tower->GetPosition();
+        enemyPos = m_unique.m_enemy->GetPositionAfter(seconds);
+        m_unique.m_tick = enemyPos - m_unique.m_position;
         seconds = abs((m_unique.m_tick.x > m_unique.m_tick.y ? m_unique.m_tick.x : m_unique.m_tick.y ) / l_tower->GetUpgradeProporties().m_bulletSpeed);
         m_unique.m_timeToHitTarget = m_unique.m_baseTimeToHitTarget = seconds;
         m_unique.m_damage = l_tower->GetUpgradeProporties().m_damage;
-        m_unique.m_position = l_tower->GetPosition();
-        m_unique.m_angle = static_cast<float>(atan2(m_unique.m_position.y - pos.y, m_unique.m_position.x - pos.x) * 180 / 3.141);
+        m_unique.m_angle = static_cast<float>(atan2(m_unique.m_position.y - enemyPos.y, m_unique.m_position.x - enemyPos.x) * 180 / 3.141);
         m_unique.m_angle += 90;
     }
 }

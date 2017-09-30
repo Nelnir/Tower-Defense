@@ -31,7 +31,8 @@ public:
     void Restart();
     std::shared_ptr<EnemyBase> GetEnemyFor(AbstractTower* l_tower);
     void RemoveEnemy(EnemyBase* l_enemy){
-        m_toRemove.push_back(*std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](std::shared_ptr<EnemyBase>& a) { return a.get() == l_enemy; }));
+        auto itr = std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](std::shared_ptr<EnemyBase>& a) { return a.get() == l_enemy; });
+        if(itr != m_enemies.end()){ m_toRemove.push_back(*itr); }
     }
 
 private:
@@ -49,6 +50,7 @@ private:
     SharedContext* m_context;
     EnemyFactory m_factory;
     Enemies m_enemies;
+    Enemies m_sorted; /// getting enemies for towers is faster
     EnemiesProporties m_enemyProporties;
     std::unordered_map<Enemy, std::unordered_map<EnemyId, std::string>> m_pathProporties;
     EnemiesToRemove m_toRemove;

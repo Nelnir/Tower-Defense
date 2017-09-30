@@ -7,13 +7,14 @@
 #include "abstracttower.h"
 
 #include "texturemanager.h"
-
+#include "tank_enemy.h"
 
 EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
     m_statistics(l_statistics)
 {
     LoadConfigFile("enemies.cfg");
     RegisterEnemy<EnemyBase>(Enemy::Soldier);
+    RegisterEnemy<Tank_Enemy>(Enemy::Tank);
 }
 
 EnemyManager::~EnemyManager() { Purge(); }
@@ -23,6 +24,9 @@ void EnemyManager::Purge()
     for(auto& itr : m_enemyProporties){
         for(auto& itr2 : itr.second){
             m_context->m_textureManager->ReleaseResource(itr2.second->m_texture);
+            if(itr2.second->m_enemy == Enemy::Tank){
+                m_context->m_textureManager->ReleaseResource(dynamic_cast<TankProporties*>(itr2.second)->m_tankTexture);
+            }
             delete itr2.second;
         }
     }
@@ -49,11 +53,11 @@ void EnemyManager::SpawnEnemy(const Enemy &l_enemy, const EnemyId& l_id, const s
         LoadProporties(l_enemy, l_id, itr4->second);
         itr2 = m_enemyProporties.find(l_enemy);
     }
-
     auto itr5 = itr2->second.find(l_id);
-    m_enemies.emplace_back(std::make_shared<EnemyBase>(*itr->second(itr5->second)));
+    m_enemies.emplace_back(itr->second(itr5->second));
     m_enemies.back()->SetPosition(l_pos);
     m_enemies.back()->SetDestination(l_destination);
+    m_sorted.emplace_back(m_enemies.back());
 }
 
 void EnemyManager::LoadConfigFile(const std::string &l_file)
@@ -87,7 +91,12 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
         return;
     }
 
-    EnemyProporties* proporties = new EnemyProporties;
+    EnemyProporties* proporties;
+    if(l_enemy == Enemy::Soldier){
+        proporties = new EnemyProporties;
+    } else if(l_enemy == Enemy::Tank){
+        proporties = new TankProporties;
+    }
     proporties->m_enemy = l_enemy;
 
     std::string line;
@@ -119,6 +128,16 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
             keystream >> proporties->m_lifeTakes;
         } else if(type == "MONEY"){
             keystream >> proporties->m_money;
+        } else if(l_enemy == Enemy::Tank){
+            if(type == "TANK"){
+                sf::IntRect rect;
+                TankProporties* prop = dynamic_cast<TankProporties*>(proporties);
+                keystream >> prop->m_tankTexture >> rect.left >> rect.top >> rect.width >> rect.height;
+                m_context->m_textureManager->RequireResource(prop->m_tankTexture);
+                prop->m_tankSprite.setTexture(*m_context->m_textureManager->GetResource(prop->m_tankTexture));
+                prop->m_tankSprite.setTextureRect(rect);
+                prop->m_tankSprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
+            }
         }
     }
     sf::IntRect size = proporties->m_sprite.getTextureRect();
@@ -150,7 +169,7 @@ sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
     sf::Vector2f dest = m_context->m_level->GetWaypointAfter(l_enemy->m_unique.m_waypoint);
     if(dest.x == -1 && dest.y == -1){
         m_context->m_level->AddLifes(-l_enemy->m_proporties->m_lifeTakes);
-        m_toRemove.push_back(std::make_shared<EnemyBase>(*l_enemy));
+        RemoveEnemy(l_enemy);
     }
     return dest;
 }
@@ -164,6 +183,7 @@ void EnemyManager::ProcessRequests()
             m_statistics->AddEnemiesKilled();
 
             m_enemies.erase(std::find(m_enemies.begin(), m_enemies.end(), m_toRemove.back()));
+            m_sorted.erase(std::find(m_sorted.begin(), m_sorted.end(), m_toRemove.back()));
 
             m_toRemove.pop_back();
         }
@@ -180,7 +200,7 @@ void EnemyManager::Restart()
 
 void EnemyManager::Sort()
 {
-    std::sort(m_enemies.begin(), m_enemies.end(), [](std::shared_ptr<EnemyBase>& a, std::shared_ptr<EnemyBase>& b) -> bool{
+    std::sort(m_sorted.begin(), m_sorted.end(), [](std::shared_ptr<EnemyBase>& a, std::shared_ptr<EnemyBase>& b) -> bool{
         if(a->m_unique.m_waypoint != b->m_unique.m_waypoint){
             return a->m_unique.m_waypoint > b->m_unique.m_waypoint;
         }
@@ -199,17 +219,19 @@ void EnemyManager::Sort()
 std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(AbstractTower *l_tower)
 {
     std::shared_ptr<EnemyBase> previous;
-    for(auto& itr : m_enemies){
+    for(auto& itr : m_sorted){
         bool aabb = (static_cast<int>(itr->GetEnemyProporties()->m_enemy) % 2) == 0;
         sf::Vector2f enemyPos = itr->GetProporties()->m_position;
         if(aabb){ /// aabb circle collision
             const twoFloats& size = itr->GetEnemyProporties()->m_size;
             sf::FloatRect rect(enemyPos.x - size.x / 2.f, enemyPos.y - size.y / 2.f, size.x, size.y);
             if(Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
-                if(l_tower->GetStrategy() == AttackStrategy::First && !previous){
-                    return itr;
+                if(l_tower->GetProporties()->m_attacking[static_cast<int>(itr->GetEnemyProporties()->m_type)]){
+                    if(l_tower->GetStrategy() == AttackStrategy::First && !previous){
+                        return itr;
+                    }
+                    previous = itr;
                 }
-                previous = itr;
             } else if(previous){
                 return previous;
             }

@@ -17,7 +17,7 @@ struct EventDetails;
 class TowerManager
 {
 public:
-    TowerManager(SharedContext* l_context, const float& l_zoom, Statistics* l_statistics);
+    TowerManager(SharedContext* l_context, Statistics* l_statistics);
     ~TowerManager();
     TowerProporties* GetProporties(const Tower& l_type);
     void Pressed(TowerProporties* l_proporties);
@@ -28,6 +28,7 @@ public:
     void HandleKey(EventDetails* l_details);
     SharedContext* GetContext() { return m_context; }
     void Restart();
+    void SetZoom(const float& l_zoom) { m_zoom = l_zoom; }
 private:
     template<class T>
     void RegisterTower(const Tower& l_type){

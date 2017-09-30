@@ -49,7 +49,7 @@ void BulletManager::SpawnBullet(AbstractTower *l_tower, const std::shared_ptr<En
         return;
     }
     BulletProporties* proporties = GetProportiesFor(l_tower->GetProporties()->m_bulletType);
-    if(proporties == nullptr){
+    if(!proporties){
         return;
     }
     m_bullets.emplace_back(itr->second(proporties, l_enemy, l_tower));

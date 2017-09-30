@@ -5,15 +5,14 @@
 #include "level.h"
 #include "utils.h"
 #include "enemymanager.h"
+#include "abstracttower.h"
 
-#include "normal_tower.h"
-
-TowerManager::TowerManager(SharedContext* l_context, const float& l_zoom, Statistics* l_statistics) : m_context(l_context),
-    m_countId(0), m_placingTower(nullptr), m_colliding(false),
-    m_zoom(l_zoom), m_statistics(l_statistics)
+TowerManager::TowerManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
+    m_countId(0), m_placingTower(nullptr), m_colliding(false), m_zoom(0.f),
+    m_statistics(l_statistics)
 {
     RegisterProporties(Tower::Basic, CreateTowerProporties(Tower::Basic));
-    RegisterTower<Normal_Tower>(Tower::Basic);
+    RegisterTower<AbstractTower>(Tower::Basic);
 }
 
 TowerManager::~TowerManager() { Purge(); }
@@ -32,7 +31,7 @@ TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
     case Tower::Basic:
         proporties->m_cost = 100;
         proporties->m_tower = Tower::Basic;
-        proporties->m_type = TowerType::Land;
+        proporties->m_attacking.set(static_cast<int>(EnemyType::Land));
         proporties->m_bulletType = BulletType::Normal;
         proporties->m_radiusCollision = 30.f;
         proporties->m_towerRotation = true;
@@ -40,10 +39,9 @@ TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
         UpgradeProporties upp;
         upp.m_cost = 0;
         upp.m_damage = 25;
-        upp.m_firingRate = 5;
+        upp.m_firingRate = 1.f;
         upp.m_radius = 1205.f;
-        upp.m_shoots = 1;
-        upp.m_bulletSpeed = 1250.f;
+        upp.m_bulletSpeed = 3250.f;
         proporties->m_upgrades.emplace_back(upp);
         break;
     default:

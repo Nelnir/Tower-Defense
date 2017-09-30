@@ -9,7 +9,7 @@
 #include "abstracttower.h"
 #include "statemanager.h"
 
-Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn, Statistics* l_statistics) : m_context(l_context),
+Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn, Statistics* l_statistics) : m_zoom(1.f), m_context(l_context),
     m_maxMapSize(0, 0), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
     m_interface(l_interface), m_connections(l_conn), m_previousTime(0), m_statistics(l_statistics) {}
 
@@ -212,8 +212,12 @@ void Level::LoadLevel(const std::string &l_file)
             keystream >> m_money;
             m_baseMoney = m_money;
             m_statistics->AddMoneyEarned(m_money);
+        } else if(type == "ZOOM"){
+            keystream >> m_zoom;
+        } else if(type == "CENTER"){
+            keystream >> m_center.x >> m_center.y;
         }
-    };
+    }
     Initialize();
     file.close();
 }

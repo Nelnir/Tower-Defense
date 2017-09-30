@@ -180,9 +180,11 @@ END 0 10 0
 |ID|Placeable
 BACKGROUND 157 1
 |Interval|Reward|Time|Enemy|EnemyId
-WAVE 0.25 50 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+WAVE 0.25 50 5 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 WAVE 2 75 0 0 1 0 1 0 1
 |StartLifes
 LIFES 20
 |StartMoney
 MONEY 250
+ZOOM 1.5
+CENTER 1087 544

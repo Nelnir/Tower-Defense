@@ -5,7 +5,7 @@
 #include <memory>
 
 enum class Enemy { Soldier = 0, Tank = 2, Plane = 4}; // if %2 is equal to 0, then it's AABB collision otherwise circle
-enum class EnemyType { Normal = 0};
+enum class EnemyType { Land = 0, Air, Count };
 using EnemyId = unsigned int;
 
 struct twoFloats{
@@ -13,6 +13,7 @@ struct twoFloats{
 };
 
 struct EnemyProporties{
+    virtual ~EnemyProporties() {}
     Enemy m_enemy;
     EnemyType m_type;
     float m_baseSpeed;

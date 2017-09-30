@@ -41,13 +41,13 @@ SOURCES += main.cpp \
     state_selectlevel.cpp \
     level.cpp \
     towermanager.cpp \
-    normal_tower.cpp \
     abstractenemy.cpp \
     enemymanager.cpp \
     state_gameover.cpp \
     abstracttower.cpp \
     bulletmanager.cpp \
-    bullet.cpp
+    bullet.cpp \
+    tank_enemy.cpp
 
 HEADERS += \
     window.h \
@@ -81,13 +81,13 @@ HEADERS += \
     level.h \
     abstracttower.h \
     towermanager.h \
-    normal_tower.h \
     abstractenemy.h \
     enemymanager.h \
     state_gameover.h \
     statistics.h \
     bulletmanager.h \
-    bullet.h
+    bullet.h \
+    tank_enemy.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -129,4 +129,5 @@ DISTFILES += \
     Data/Interfaces/GameOverWin.interface \
     Data/Styles/win.style \
     Data/Styles/GameTextSpeed.style \
-    Data/Styles/AboutText2Clickable.style
+    Data/Styles/AboutText2Clickable.style \
+    Data/Enemies/Tank.proporties

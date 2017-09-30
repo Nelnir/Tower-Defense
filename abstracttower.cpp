@@ -1,5 +1,8 @@
 #include "abstracttower.h"
 #include "abstractenemy.h"
+#include "towermanager.h"
+#include "window.h"
+#include "bulletmanager.h"
 
 AbstractTower::AbstractTower(TowerProporties *l_proporties, TowerManager *l_towerManager) :
     m_proporties(l_proporties),
@@ -18,4 +21,20 @@ void AbstractTower::RotateToEnemy(const std::shared_ptr<EnemyBase>& l_enemy)
         m_angle -= 90;
     }
     m_proporties->m_sprite.setRotation(m_angle);
+}
+
+void AbstractTower::Shot(const std::shared_ptr<EnemyBase> &l_enemy)
+{
+    m_towerManager->GetContext()->m_bulletManager->SpawnBullet(this, l_enemy);
+}
+
+void AbstractTower::Draw(sf::RenderWindow *l_wind)
+{
+    RotateToEnemy(m_lookinAt);
+    l_wind->draw(m_proporties->m_sprite);
+}
+
+void AbstractTower::Update(const float &l_dT)
+{
+
 }
