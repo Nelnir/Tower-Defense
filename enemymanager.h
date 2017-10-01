@@ -29,7 +29,7 @@ public:
     sf::Vector2f GiveNextWaypoint(EnemyBase* l_enemy);
     void ProcessRequests();
     void Restart();
-    std::shared_ptr<EnemyBase> GetEnemyFor(AbstractTower* l_tower);
+    std::shared_ptr<EnemyBase> GetEnemyFor(const std::shared_ptr<AbstractTower>& l_tower);
     void RemoveEnemy(EnemyBase* l_enemy){
         auto itr = std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](std::shared_ptr<EnemyBase>& a) { return a.get() == l_enemy; });
         if(itr != m_enemies.end()){ m_toRemove.push_back(*itr); }

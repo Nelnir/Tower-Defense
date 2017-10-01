@@ -10,7 +10,7 @@
 using TowerFactory = std::unordered_map<Tower, std::function<AbstractTower*(TowerProporties*)>>;
 using TowersProporties = std::unordered_map<Tower, TowerProporties*>;
 using TowerID = unsigned int;
-using Towers = std::unordered_map<TowerID, AbstractTower*>;
+using Towers = std::vector<std::shared_ptr<AbstractTower>>;
 
 struct EventDetails;
 
@@ -32,11 +32,12 @@ public:
     void CloseUpgrades(EventDetails* l_details) { m_interface->SetActive(false); m_pressed = nullptr; }
     void UpgradeTower(EventDetails* l_details);
     void ChangeStrategy(EventDetails* l_details);
+    void DeleteTower(EventDetails* l_details);
     void RefreshInterface();
 private:
     void UpdateAttackStrategyGUI();
     void UpdateUpgradeGUI(UpgradeProporties* l_proporties);
-    void ShowUpgradeInterfaceFor(AbstractTower* l_tower);
+    void ShowUpgradeInterfaceFor(const std::shared_ptr<AbstractTower>& l_tower);
     template<class T>
     void RegisterTower(const Tower& l_type){
         m_towerFactory[l_type] = [this] (TowerProporties* l_prop) -> AbstractTower* { return new T(l_prop, this); };
@@ -53,14 +54,13 @@ private:
     SharedContext* m_context;
     TowerFactory m_towerFactory;
     TowersProporties m_towerProporties;
-    TowerID m_countId;
     Towers m_towers;
 
     TowerProporties* m_placingTower;
     bool m_colliding;
     float m_zoom;
     Statistics* m_statistics;
-    AbstractTower* m_pressed;
+    std::shared_ptr<AbstractTower> m_pressed;
     GUI_Interface* m_interface;
 };
 

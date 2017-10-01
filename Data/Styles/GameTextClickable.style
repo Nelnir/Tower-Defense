@@ -1,6 +1,6 @@
 State Default
 Font Main
-Size 54 9
+SizeToText
 TextPadding 0 -6
 TextSize 16
 TextColor 255 255 255 255

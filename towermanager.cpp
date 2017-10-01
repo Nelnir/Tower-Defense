@@ -9,7 +9,7 @@
 #include "gui_manager.h"
 
 TowerManager::TowerManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
-    m_countId(0), m_placingTower(nullptr), m_colliding(false), m_zoom(0.f),
+    m_placingTower(nullptr), m_colliding(false), m_zoom(0.f),
     m_statistics(l_statistics), m_pressed(nullptr)
 {
     RegisterProporties(Tower::Basic, CreateTowerProporties(Tower::Basic));
@@ -23,6 +23,7 @@ TowerManager::TowerManager(SharedContext* l_context, Statistics* l_statistics) :
     m_context->m_eventManager->AddCallback(StateType::Game, "CloseUpgrades", &TowerManager::CloseUpgrades, this);
     m_context->m_eventManager->AddCallback(StateType::Game, "UpgradeTower", &TowerManager::UpgradeTower, this);
     m_context->m_eventManager->AddCallback(StateType::Game, "ChangeStrategy", &TowerManager::ChangeStrategy, this);
+    m_context->m_eventManager->AddCallback(StateType::Game, "DeleteTower", &TowerManager::DeleteTower, this);
 }
 
 TowerManager::~TowerManager() { Purge(); }
@@ -36,13 +37,11 @@ void TowerManager::Purge()
         itr.second = nullptr;
     }
     m_towerProporties.clear();
-    for(auto& itr : m_towers){
-        delete itr.second;
-    }
     m_towers.clear();
     m_context->m_eventManager->RemoveCallback(StateType::Game, "CloseUpgrades");
     m_context->m_eventManager->RemoveCallback(StateType::Game, "UpgradeTower");
     m_context->m_eventManager->RemoveCallback(StateType::Game, "ChangeStrategy");
+    m_context->m_eventManager->RemoveCallback(StateType::Game, "DeleteTower");
     m_context->m_guiManager->RemoveInterface(StateType::Game, "TowerUpgrade");
 }
 
@@ -67,8 +66,8 @@ TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
         SetTextureForProporties("Tileset", sf::IntRect(1216, 640, 64, 64), proporties);
         UpgradeProporties upp;
         upp.m_cost = 0;
-        upp.m_damage = 25;
-        upp.m_firingRate = 2.f;
+        upp.m_damage = 1;
+        upp.m_firingRate = 5.f;
         upp.m_radius = 0.f;
         upp.m_bulletSpeed = 1000.f;
         proporties->m_upgrades.emplace_back(upp);
@@ -99,9 +98,11 @@ void TowerManager::SetTextureForProporties(const std::string &l_texture, const s
 
 void TowerManager::UpgradeTower(EventDetails *l_details)
 {
+    const sf::Vector2f& pos = m_interface->GetPosition();
     m_pressed->Upgrade();
     ShowUpgradeInterfaceFor(m_pressed);
     m_context->m_level->AddMoney(-m_pressed->GetUpgradeProporties().m_cost);
+    m_interface->SetPosition(pos);
 }
 
 void TowerManager::RefreshInterface()
@@ -126,6 +127,18 @@ void TowerManager::ChangeStrategy(EventDetails *l_details)
     UpdateAttackStrategyGUI();
 }
 
+void TowerManager::DeleteTower(EventDetails *l_details)
+{
+    int money = m_pressed->GetProporties()->m_cost;
+    for(unsigned int i = 0; i <= m_pressed->GetCurrentUpgrade(); ++i){
+        money += m_pressed->GetProporties()->m_upgrades[i].m_cost;
+    }
+    m_context->m_level->AddMoney(money / 1.25);
+    m_towers.erase(std::find(m_towers.begin(), m_towers.end(), m_pressed));
+    m_interface->SetActive(false);
+    m_pressed.reset();
+}
+
 void TowerManager::Pressed(TowerProporties *l_proporties)
 {
     m_placingTower = l_proporties;
@@ -135,9 +148,8 @@ void TowerManager::Draw()
 {
     sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
     for(auto& itr : m_towers){
-        AbstractTower* tower = itr.second;
-        tower->GetProporties()->m_sprite.setPosition(tower->GetPosition());
-        tower->Draw(window);
+        itr->GetProporties()->m_sprite.setPosition(itr->GetPosition());
+        itr->Draw(window);
     }
 
     if(m_placingTower){
@@ -150,9 +162,9 @@ void TowerManager::Draw()
         bool collidingWithTowers = false;
         range.setFillColor(sf::Color(0, 0, 0, 128));
         for(auto& itr : m_towers){
-            const float& radius = itr.second->GetProporties()->m_radiusCollision;
+            const float& radius = itr->GetProporties()->m_radiusCollision;
             range.setRadius(radius);
-            sf::Vector2f pos = itr.second->GetPosition();
+            sf::Vector2f pos = itr->GetPosition();
             range.setPosition(sf::Vector2f(pos.x - radius, pos.y - radius));
             if(Utils::CirclesColliding(radius, range.getPosition(), radiusC, currPlacingTowerPos)){
                 range.setFillColor(sf::Color(255, 0, 0, 128));
@@ -200,13 +212,12 @@ void TowerManager::Draw()
 void TowerManager::Update(const float& l_dT)
 {
     for(auto& itr : m_towers){
-        AbstractTower* tower = itr.second;
-        tower->Update(l_dT);
-        tower->SetEnemy(m_context->m_enemyManager->GetEnemyFor(itr.second));
-        tower->m_shootElapsed += l_dT;
-        if(tower->m_lookinAt && tower->m_shootElapsed >= 1.f / tower->GetUpgradeProporties().m_firingRate){
-            tower->m_shootElapsed = 0.f;
-            tower->Shot(tower->m_lookinAt);
+        itr->Update(l_dT);
+        itr->SetEnemy(m_context->m_enemyManager->GetEnemyFor(itr));
+        itr->m_shootElapsed += l_dT;
+        if(itr->m_lookinAt && itr->m_shootElapsed >= 1.f / itr->GetUpgradeProporties().m_firingRate){
+            itr->m_shootElapsed = 0.f;
+            itr->Shot(itr->m_lookinAt);
         }
     }
 }
@@ -226,14 +237,12 @@ void TowerManager::HandleRelease(EventDetails *l_details)
         }
         m_context->m_level->AddMoney(-m_placingTower->m_cost);
         AddTower(m_placingTower, m_placingTower->m_sprite.getPosition());
-        m_placingTower =
-                nullptr;
+        m_placingTower = nullptr;
     } else {
         sf::Vector2i mousePos = sf::Vector2i(l_details->m_mouse.x * m_zoom, l_details->m_mouse.y * m_zoom);
         for(auto& itr : m_towers){
-            AbstractTower* tower = itr.second;
-            if(Utils::PointInsideCircle(mousePos, tower->GetPosition(), tower->GetProporties()->m_radiusCollision)){
-                m_pressed = tower;
+            if(Utils::PointInsideCircle(mousePos, itr->GetPosition(), itr->GetProporties()->m_radiusCollision)){
+                m_pressed = itr;
                 ShowUpgradeInterfaceFor(m_pressed);
                 return;
             }
@@ -259,12 +268,15 @@ void TowerManager::UpdateUpgradeGUI(UpgradeProporties *nextUpr)
     }
 }
 
-void TowerManager::ShowUpgradeInterfaceFor(AbstractTower *l_tower)
+void TowerManager::ShowUpgradeInterfaceFor(const std::shared_ptr<AbstractTower>& l_tower)
 {
     m_interface->SetActive(true);
     const float& radius = l_tower->GetProporties()->m_radiusCollision;
     const sf::Vector2f pos = sf::Vector2f((l_tower->GetPosition().x + radius) / m_zoom, (l_tower->GetPosition().y + radius) / m_zoom);
-    m_interface->SetPosition(pos);
+    const sf::Vector2u windowSize = m_context->m_wind->GetWindowSize();
+    /// 170 is size of game interface
+    const sf::Vector2f diff = sf::Vector2f(windowSize.x - pos.x - 170 - m_interface->GetSize().x, windowSize.y - pos.y - m_interface->GetSize().y);
+    m_interface->SetPosition(sf::Vector2f(pos.x + (diff.x < 0 ? diff.x : 0), pos.y + (diff.y < 0 ? diff.y : 0)));
 
     const UpgradeProporties& upr = l_tower->GetUpgradeProporties();
     m_interface->GetElement("Upgrades")->SetText("Upgrade: " + std::to_string(l_tower->GetCurrentUpgrade()) +
@@ -331,18 +343,15 @@ void TowerManager::AddTower(TowerProporties *l_proporties, const sf::Vector2f& l
     if(itr == m_towerFactory.end()){
         return;
     }
-    AbstractTower* tower = m_towers.emplace(m_countId++, itr->second(l_proporties)).first->second;
-    tower->SetPosition(l_pos);
+    m_towers.emplace_back(itr->second(l_proporties));
+    m_towers.back()->SetPosition(l_pos);
     m_statistics->AddTowersPlaced();
 }
 
 void TowerManager::Restart()
 {
-    for(auto& itr : m_towers){
-        delete itr.second;
-    }
     m_towers.clear();
-    m_pressed = nullptr;
+    m_pressed.reset();
     m_placingTower = nullptr;
     m_interface->SetActive(false);
 }

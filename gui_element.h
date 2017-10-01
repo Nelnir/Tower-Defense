@@ -7,7 +7,7 @@
 enum class GUI_ElementState { Neutral, Focused, Clicked, Locked, Count};
 
 struct GUI_Style{
-    GUI_Style() : m_textSize(12), m_textCenterOrigin(false), m_backgroundImageColor(255, 255, 255, 255), m_imageRect(0, 0, 0, 0)
+    GUI_Style() : m_textSize(12), m_sizeToText(false), m_textCenterOrigin(false), m_backgroundImageColor(255, 255, 255, 255), m_imageRect(0, 0, 0, 0)
     {
         sf::Color none = {0, 0, 0, 0};
         m_backgroundColor = m_elementColor = m_textColor = none;
@@ -15,6 +15,7 @@ struct GUI_Style{
 
     sf::Vector2f m_size; // Element size.
     sf::Vector2f m_imageSize;
+    bool m_sizeToText;
     // Background properties.
     sf::Color m_backgroundColor;
     sf::Color m_elementColor;

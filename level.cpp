@@ -427,6 +427,10 @@ void Level::Win()
 
 void Level::Lose()
 {
+    if(m_context->m_stateMgr->HasState(StateType::GameOver)){
+        return;
+    }
+    m_context->m_settings->SetWin(false);
     m_context->m_stateMgr->SwitchTo(StateType::GameOver);
     m_interface->SetContentRedraw(true); /// well in State_GameOver we are drawning this interface manually, but it wont change it content if it wont be able
     /// to call it's update method, so we set manually flag for redrawning to show updated lifes

@@ -179,9 +179,6 @@ void EnemyManager::ProcessRequests()
     if(!m_toRemove.empty()){
         while(!m_toRemove.empty()){
 
-            m_statistics->AddEnemiesWithTypeKilled(m_toRemove.back()->GetEnemyProporties()->m_enemy);
-            m_statistics->AddEnemiesKilled();
-
             m_enemies.erase(std::find(m_enemies.begin(), m_enemies.end(), m_toRemove.back()));
             m_sorted.erase(std::find(m_sorted.begin(), m_sorted.end(), m_toRemove.back()));
 
@@ -216,7 +213,7 @@ void EnemyManager::Sort()
     });
 }
 
-std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(AbstractTower *l_tower)
+std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(const std::shared_ptr<AbstractTower>& l_tower)
 {
     std::shared_ptr<EnemyBase> previous;
     for(auto& itr : m_sorted){

@@ -133,7 +133,6 @@ DISTFILES += \
     Data/Enemies/Tank.proporties \
     Data/Interfaces/TowerUpgrade.interface \
     Data/Styles/TowerUpgradeInterface.style \
-    Data/Styles/UpgradeUpgradeButton.style \
-    Data/Styles/UpgradeCloseButton.style \
     Data/Styles/GameTextClickable.style \
-    Data/Styles/GameTextNext.style
+    Data/Styles/GameTextNext.style \
+    Data/Styles/UpgradeButton.style

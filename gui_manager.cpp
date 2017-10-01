@@ -282,12 +282,12 @@ bool GUI_Manager::LoadInterface(const StateType &l_state, const std::string &l_i
                 continue;
             }
             GUI_Element* e = i->GetElement(name);
-            keystream >> *e;
             e->SetPosition(position);
             if (!LoadStyle(style, e)){
                 std::cout << "Failed loading style file: " << style << " for element " << name << std::endl;
                 continue;
             }
+            keystream >> *e;
         }
     }
     file.close();
@@ -374,6 +374,8 @@ bool GUI_Manager::LoadStyle(const std::string &l_file, GUI_Element *l_element)
                 keystream >> TemporaryStyle.m_textSize;
             } else if (type == "TextOriginCenter"){
                 TemporaryStyle.m_textCenterOrigin = true;
+            } else if(type == "SizeToText"){
+                TemporaryStyle.m_sizeToText = true;
             } else if (type == "Font"){
                 keystream >> TemporaryStyle.m_textFont;
             } else if (type == "TextPadding"){

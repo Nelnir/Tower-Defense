@@ -103,12 +103,12 @@ void GUI_Element::UpdateBgStyle(const GUI_ElementState &l_state, const GUI_Style
 
 void GUI_Element::ApplyStyle()
 {
-     ApplyTextStyle();
-     ApplyBgStyle();
-     ApplyGlyphStyle();
-     if (m_owner != this && !IsControl()){
-        m_owner->AdjustContentSize(this);
-     }
+    ApplyTextStyle();
+    ApplyBgStyle();
+    ApplyGlyphStyle();
+    if (m_owner != this && !IsControl()){
+       m_owner->AdjustContentSize(this);
+    }
 }
 
 void GUI_Element::ApplyTextStyle()
@@ -170,6 +170,9 @@ void GUI_Element::SetState(const GUI_ElementState& l_state)
         return;
     }
     m_state = l_state;
+    if(m_style[m_state].m_sizeToText){
+        m_style[m_state].m_size = GetTextSize();
+    }
     SetRedraw(true);
 }
 
@@ -237,4 +240,7 @@ void GUI_Element::SetText(const std::string& l_text)
 {
     m_visual.m_text.setString(l_text);
     SetRedraw(true);
+    if(m_style[m_state].m_sizeToText){
+        m_style[m_state].m_size = GetTextSize();
+    }
 }

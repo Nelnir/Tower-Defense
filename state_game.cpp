@@ -53,6 +53,7 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
     eveM->AddCallback(StateType::Game, "Start_Game", &State_Game::StartGame, this);
+    eveM->AddCallback(StateType::Game, "Key_P", &State_Game::StartGame, this);
     eveM->AddCallback(StateType::Game, "SpeedChange", &State_Game::SpeedChange, this);
 
     UpdateSpeedGUI();
@@ -70,6 +71,7 @@ void State_Game::OnDestroy()
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
     eveM->RemoveCallback(StateType::Game, "Start_Game");
     eveM->RemoveCallback(StateType::Game, "SpeedChange");
+    eveM->RemoveCallback(StateType::Game, "Key_P");
 }
 
 void State_Game::Update(const sf::Time &l_time)

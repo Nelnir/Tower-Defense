@@ -23,6 +23,9 @@ void GUI_Label::ReadIn(std::stringstream &l_stream)
         content.replace(start, 2, "\n");
     }
     m_visual.m_text.setString(content);
+    if(m_style[m_state].m_sizeToText){
+        m_style[m_state].m_size = GetTextSize();
+    }
 }
 
 void GUI_Label::OnClick(const sf::Vector2f& l_mousePos)
