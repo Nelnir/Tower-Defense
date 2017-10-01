@@ -217,6 +217,11 @@ const sf::Vector2f& GUI_Element::GetSize() const
     return m_style.at(m_state).m_size;
 }
 
+sf::Vector2f GUI_Element::GetTextSize() const
+{
+    return sf::Vector2f(m_visual.m_text.getLocalBounds().width, m_visual.m_text.getLocalBounds().height);
+}
+
 void GUI_Element::SetActive(const bool& l_active)
 {
     if (l_active != m_active){

@@ -105,7 +105,7 @@ void State_Game::Activate()
 
 void State_Game::Deactivate()
 {
-
+    m_playing = false;
 }
 
 void State_Game::TowerPressed(EventDetails* l_details)

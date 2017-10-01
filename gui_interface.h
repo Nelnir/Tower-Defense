@@ -79,6 +79,6 @@ private:
     sf::RenderTexture* m_controlTexture;
     sf::Sprite m_control;
     bool m_controlRedraw;
-   };
+};
 
 #endif // GUI_INTERFACE_H

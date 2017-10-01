@@ -45,13 +45,18 @@ public:
     virtual void Draw(sf::RenderWindow* l_wind);
     virtual void Update(const float& l_dT);
 
-    UpgradeProporties& GetUpgradeProporties() { return m_proporties->m_upgrades[m_currentUpgrade]; }
+    const UpgradeProporties& GetUpgradeProporties() { return m_proporties->m_upgrades[m_currentUpgrade]; }
+    UpgradeProporties* GetNextUpgradeProporties();
     TowerProporties* GetProporties() { return m_proporties; }
     AttackStrategy GetStrategy() { return m_strategy; }
     sf::Vector2f GetPosition() { return m_position; }
+    void SetStrategy(const AttackStrategy& l_strategy) { m_strategy = l_strategy; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_position = l_pos; }
     void SetEnemy(const std::shared_ptr<EnemyBase>& l_enemy){ if(m_lookinAt != l_enemy) m_lookinAt = l_enemy; }
+    unsigned int GetCurrentUpgrade() { return m_currentUpgrade; }
+    unsigned int GetNumberOfUpgrades() { return m_proporties->m_upgrades.size(); }
+    void Upgrade() { ++m_currentUpgrade; }
 protected:
     virtual void Shot(const std::shared_ptr<EnemyBase>& l_enemy);
     void RotateToEnemy(const std::shared_ptr<EnemyBase>& l_enemy);

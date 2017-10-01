@@ -225,7 +225,7 @@ std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(AbstractTower *l_tower)
         if(aabb){ /// aabb circle collision
             const twoFloats& size = itr->GetEnemyProporties()->m_size;
             sf::FloatRect rect(enemyPos.x - size.x / 2.f, enemyPos.y - size.y / 2.f, size.x, size.y);
-            if(Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
+            if(!l_tower->GetUpgradeProporties().m_radius || Utils::CircleAABBColliding(l_tower->GetPosition(), l_tower->GetUpgradeProporties().m_radius, rect)){
                 if(l_tower->GetProporties()->m_attacking[static_cast<int>(itr->GetEnemyProporties()->m_type)]){
                     if(l_tower->GetStrategy() == AttackStrategy::First && !previous){
                         return itr;

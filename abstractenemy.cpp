@@ -2,6 +2,7 @@
 #include "enemymanager.h"
 #include "bullet.h"
 #include "level.h"
+#include "statistics.h"
 #include <iostream>
 
 EnemyBase::~EnemyBase()
@@ -59,6 +60,7 @@ void EnemyBase::OnBulletHit(Bullet *l_bullet)
     if(m_unique.m_hp <= 0){
         m_enemyManager->RemoveEnemy(this);
         m_enemyManager->GetContext()->m_level->AddMoney(m_proporties->m_money);
+        m_enemyManager->GetContext()->m_statistics->AddMoneyEarned(m_proporties->m_money);
     }
     m_enemyManager->GetContext()->m_statistics->AddDmgDealt(l_bullet->GetDamage());
 }

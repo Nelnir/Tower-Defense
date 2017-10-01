@@ -70,6 +70,7 @@ public:
     inline sf::Vector2f GetPosition() const { return m_position; }
     sf::Vector2f GetGlobalPosition() const;
     const sf::Vector2f& GetSize() const;
+    sf::Vector2f GetTextSize() const;
     void SetActive(const bool& l_active);
     std::string GetText() const;
     void SetText(const std::string& l_text);

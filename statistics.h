@@ -26,6 +26,8 @@ public:
     void Reset(){
         m_totalMoneyEarned = m_totalMonstersKilled = m_totalTowersPlaced = 0;
         m_timePlayed = 0;
+        m_totalDmgDealt = 0;
+        m_enemiesTypeKilled.clear();
     }
     const unsigned int& GetMoneyEarned() { return m_totalMoneyEarned; }
     const unsigned int& GetMonstersKilled() { return m_totalMonstersKilled; }

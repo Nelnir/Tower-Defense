@@ -8,6 +8,7 @@
 #include "gui_interface.h"
 #include "abstracttower.h"
 #include "statemanager.h"
+#include "towermanager.h"
 
 Level::Level(SharedContext* l_context, GUI_Interface* l_interface, Connections* l_conn, Statistics* l_statistics) : m_zoom(1.f), m_context(l_context),
     m_maxMapSize(0, 0), m_currentWave(0), m_spawnedEnemies(0), m_elapsed(0), m_lifes(0), m_money(0),
@@ -322,6 +323,12 @@ bool Level::CollideWithPath(const sf::CircleShape &l_circle)
     return false;
 }
 
+bool Level::IsOutsideMap(const sf::CircleShape &l_circle)
+{
+    sf::Vector2f mapSize = sf::Vector2f((m_maxMapSize.x - 1) * Sheet::Tile_Size, (m_maxMapSize.y - 1) * Sheet::Tile_Size);
+    return !Utils::CircleAABBColliding(l_circle.getPosition(), l_circle.getRadius(), sf::FloatRect(0, 0, mapSize.x, mapSize.y));
+}
+
 sf::Vector2f Level::GetWaypointAfter(int l_waypoint)
 {
     if(l_waypoint + 1 == m_waypoints.size()){
@@ -343,6 +350,7 @@ void Level::AddMoney(const int &l_money)
 {
     m_money += l_money;
     UpdateMoneyGUI();
+    m_context->m_towerManager->RefreshInterface();
 }
 
 void Level::UpdateLifesGUI()
@@ -409,6 +417,9 @@ void Level::NextWave()
 
 void Level::Win()
 {
+    if(m_context->m_stateMgr->HasState(StateType::GameOver)){
+        return;
+    }
     m_context->m_settings->SetWin(true);
     m_context->m_stateMgr->SwitchTo(StateType::GameOver);
     m_interface->SetContentRedraw(true);

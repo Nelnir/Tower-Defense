@@ -38,3 +38,10 @@ void AbstractTower::Update(const float &l_dT)
 {
 
 }
+
+UpgradeProporties* AbstractTower::GetNextUpgradeProporties()
+{
+    if(m_currentUpgrade + 1 < m_proporties->m_upgrades.size()){
+        return &m_proporties->m_upgrades[m_currentUpgrade + 1];
+    } else return nullptr;
+}

@@ -29,7 +29,14 @@ public:
     SharedContext* GetContext() { return m_context; }
     void Restart();
     void SetZoom(const float& l_zoom) { m_zoom = l_zoom; }
+    void CloseUpgrades(EventDetails* l_details) { m_interface->SetActive(false); m_pressed = nullptr; }
+    void UpgradeTower(EventDetails* l_details);
+    void ChangeStrategy(EventDetails* l_details);
+    void RefreshInterface();
 private:
+    void UpdateAttackStrategyGUI();
+    void UpdateUpgradeGUI(UpgradeProporties* l_proporties);
+    void ShowUpgradeInterfaceFor(AbstractTower* l_tower);
     template<class T>
     void RegisterTower(const Tower& l_type){
         m_towerFactory[l_type] = [this] (TowerProporties* l_prop) -> AbstractTower* { return new T(l_prop, this); };
@@ -53,6 +60,8 @@ private:
     bool m_colliding;
     float m_zoom;
     Statistics* m_statistics;
+    AbstractTower* m_pressed;
+    GUI_Interface* m_interface;
 };
 
 #endif // TOWERMANAGER_H

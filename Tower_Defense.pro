@@ -130,4 +130,10 @@ DISTFILES += \
     Data/Styles/win.style \
     Data/Styles/GameTextSpeed.style \
     Data/Styles/AboutText2Clickable.style \
-    Data/Enemies/Tank.proporties
+    Data/Enemies/Tank.proporties \
+    Data/Interfaces/TowerUpgrade.interface \
+    Data/Styles/TowerUpgradeInterface.style \
+    Data/Styles/UpgradeUpgradeButton.style \
+    Data/Styles/UpgradeCloseButton.style \
+    Data/Styles/GameTextClickable.style \
+    Data/Styles/GameTextNext.style

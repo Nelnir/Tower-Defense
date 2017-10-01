@@ -42,6 +42,10 @@ namespace Utils
         return (sqrt(a_square + b_square) <= l_radius + l_radius2);
     }
 
+    inline bool PointInsideCircle(const sf::Vector2i& l_point, const sf::Vector2f& l_pos, const float& l_radius){
+        return pow(l_point.x - l_pos.x, 2) + pow(l_point.y - l_pos.y, 2) <= pow(l_radius, 2);
+    }
+
     template<class T>
     const T& clamp( const T& v, const T& lo, const T& hi )
     {

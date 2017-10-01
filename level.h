@@ -82,6 +82,7 @@ public:
     void Update(const float& l_dT);
     Tile* GetTile(const unsigned int& l_x, const unsigned int& l_y, const unsigned int& l_layer);
     bool CollideWithPath(const sf::CircleShape& l_circle);
+    bool IsOutsideMap(const sf::CircleShape& l_circle);
     sf::Vector2f GetWaypointAfter(int l_waypoint);
 
     void AddLifes(const int& l_lifes);
@@ -91,6 +92,7 @@ public:
     GUI_Interface* GetInterface() { return m_interface; }
     float GetZoom() { return m_zoom; }
     sf::Vector2f GetCenter() { return m_center; }
+    int GetMoney() { return m_money; }
 private:
     void Initialize();
     void UpdateMoneyGUI();
