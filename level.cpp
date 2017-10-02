@@ -6,7 +6,7 @@
 #include "window.h"
 #include "enemymanager.h"
 #include "gui_interface.h"
-#include "abstracttower.h"
+#include "TowerBase.h"
 #include "statemanager.h"
 #include "towermanager.h"
 
@@ -304,8 +304,6 @@ bool Level::CollideWithPath(const sf::CircleShape &l_circle)
 {
     sf::Vector2f pos = l_circle.getPosition();
     float radius = l_circle.getRadius();
-    pos.x += radius;
-    pos.y += radius;
     for(unsigned layer = 0; layer < static_cast<unsigned int>(Sheet::Num_Layers); ++layer){
         for(unsigned int x = 0; x < m_maxMapSize.x; ++x){
             for(unsigned int y = 0; y < m_maxMapSize.y; ++y){
@@ -362,8 +360,7 @@ void Level::UpdateMoneyGUI()
 {
     m_interface->GetElement("Money")->SetText("Money: " + std::to_string(m_money) + m_context->m_settings->GetCurrency());
     for(auto& itr : *m_connections){
-        TowerProporties* prop = itr.second;
-        if(prop->m_cost > m_money){
+        if(itr.second->m_cost > m_money){
             m_interface->GetElement(itr.first)->SetState(GUI_ElementState::Locked);
         } else{
             m_interface->GetElement(itr.first)->SetState(GUI_ElementState::Neutral);

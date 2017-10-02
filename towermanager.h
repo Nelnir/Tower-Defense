@@ -1,26 +1,25 @@
 #ifndef TOWERMANAGER_H
 #define TOWERMANAGER_H
 
-#include "abstracttower.h"
+#include "TowerBase.h"
 #include "sharedcontext.h"
 #include "statistics.h"
 #include <unordered_map>
 #include <functional>
 
-using TowerFactory = std::unordered_map<Tower, std::function<AbstractTower*(TowerProporties*)>>;
-using TowersProporties = std::unordered_map<Tower, TowerProporties*>;
+using TowerFactory = std::unordered_map<Tower, std::function<std::shared_ptr<TowerBase>(const std::shared_ptr<TowerProporties>&)>>;
+using TowersProporties = std::unordered_map<Tower, std::shared_ptr<TowerProporties>>;
 using TowerID = unsigned int;
-using Towers = std::vector<std::shared_ptr<AbstractTower>>;
+using Towers = std::vector<std::shared_ptr<TowerBase>>;
 
 struct EventDetails;
-
 class TowerManager
 {
 public:
     TowerManager(SharedContext* l_context, Statistics* l_statistics);
     ~TowerManager();
-    TowerProporties* GetProporties(const Tower& l_type);
-    void Pressed(TowerProporties* l_proporties);
+    std::shared_ptr<TowerProporties> GetProporties(const Tower& l_type);
+    void Pressed(const std::shared_ptr<TowerProporties>& l_proporties);
     void Draw();
     void Update(const float& l_dT);
 
@@ -35,20 +34,23 @@ public:
     void DeleteTower(EventDetails* l_details);
     void RefreshInterface();
 private:
+    void LoadConfigFile(const std::string& l_file);
+    void LoadProportiesFor(const Tower& l_type, const std::string& l_file);
     void UpdateAttackStrategyGUI();
     void UpdateUpgradeGUI(UpgradeProporties* l_proporties);
-    void ShowUpgradeInterfaceFor(const std::shared_ptr<AbstractTower>& l_tower);
+    void ShowUpgradeInterfaceFor(const std::shared_ptr<TowerBase>& l_tower);
     template<class T>
     void RegisterTower(const Tower& l_type){
-        m_towerFactory[l_type] = [this] (TowerProporties* l_prop) -> AbstractTower* { return new T(l_prop, this); };
+        m_towerFactory[l_type] = [this] (const std::shared_ptr<TowerProporties>& l_prop) -> std::shared_ptr<TowerBase> {
+            return std::move(std::make_shared<T>(l_prop, this));
+        };
     }
-    void RegisterProporties(const Tower& l_type, TowerProporties* l_proporties){
+    void RegisterProporties(const Tower& l_type, const std::shared_ptr<TowerProporties>& l_proporties){
         m_towerProporties[l_type] = l_proporties;
     }
     void Purge();
-    TowerProporties* CreateTowerProporties(const Tower& l_type);
-    void SetTextureForProporties(const std::string& l_texture, const sf::IntRect& l_rect, TowerProporties* l_proporties);
-    void AddTower(TowerProporties* l_proporties, const sf::Vector2f& l_pos);
+    void SetTextureForProporties(const std::string& l_texture, const sf::IntRect& l_rect, const std::shared_ptr<TowerProporties>& l_proporties);
+    void AddTower(const std::shared_ptr<TowerProporties>& l_proporties, const sf::Vector2f& l_pos);
 
 
     SharedContext* m_context;
@@ -56,11 +58,11 @@ private:
     TowersProporties m_towerProporties;
     Towers m_towers;
 
-    TowerProporties* m_placingTower;
+    std::shared_ptr<TowerProporties> m_placingTower;
     bool m_colliding;
     float m_zoom;
     Statistics* m_statistics;
-    std::shared_ptr<AbstractTower> m_pressed;
+    std::shared_ptr<TowerBase> m_pressed;
     GUI_Interface* m_interface;
 };
 

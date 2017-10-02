@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "window.h"
 #include "level.h"
-#include "abstracttower.h"
+#include "TowerBase.h"
 
 #include "texturemanager.h"
 #include "tank_enemy.h"
@@ -213,7 +213,7 @@ void EnemyManager::Sort()
     });
 }
 
-std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(const std::shared_ptr<AbstractTower>& l_tower)
+std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(const std::shared_ptr<TowerBase>& l_tower)
 {
     std::shared_ptr<EnemyBase> previous;
     for(auto& itr : m_sorted){

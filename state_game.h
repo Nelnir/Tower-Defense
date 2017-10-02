@@ -10,7 +10,7 @@
 #include "bulletmanager.h"
 #include <memory>
 
-using Connections = std::unordered_map<std::string, TowerProporties*>;
+using Connections = std::unordered_map<std::string, std::shared_ptr<TowerProporties>>;
 
 struct TowerProporties;
 class GUI_Element;
@@ -35,7 +35,7 @@ public:
 private:
     inline void UpdateSpeedGUI();
 
-    void PrepareElement(GUI_Element* l_element, TowerProporties* l_proporties);
+    void PrepareElement(GUI_Element* l_element, const std::shared_ptr<TowerProporties>& l_proporties);
     Statistics m_statistics;
     std::unique_ptr<Level> m_level;
     TowerManager m_towerManager;

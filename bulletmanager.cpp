@@ -1,12 +1,15 @@
 #include "bulletmanager.h"
 #include "window.h"
-#include "abstractenemy.h"
+#include "EnemyBase.h"
 #include "texturemanager.h"
-#include <abstracttower.h>
+#include <TowerBase.h>
+#include "missile.h"
 BulletManager::BulletManager(SharedContext* l_context) : m_context(l_context)
 {
     RegisterProporties(BulletType::Normal, CreateProportiesFor(BulletType::Normal));
+    RegisterProporties(BulletType::Missile, CreateProportiesFor(BulletType::Missile));
     RegisterBullet<Bullet>(BulletType::Normal);
+    RegisterBullet<Missile>(BulletType::Missile);
 }
 
 BulletManager::~BulletManager()
@@ -42,7 +45,7 @@ void BulletManager::Update(const float &l_dT)
     }
 }
 
-void BulletManager::SpawnBullet(AbstractTower *l_tower, const std::shared_ptr<EnemyBase>& l_enemy)
+void BulletManager::SpawnBullet(TowerBase *l_tower, const std::shared_ptr<EnemyBase>& l_enemy)
 {
     auto itr = m_factory.find(l_tower->GetProporties()->m_bulletType);
     if(itr == m_factory.end()){
@@ -52,7 +55,8 @@ void BulletManager::SpawnBullet(AbstractTower *l_tower, const std::shared_ptr<En
     if(!proporties){
         return;
     }
-    m_bullets.emplace_back(itr->second(proporties, l_enemy, l_tower));
+    m_bullets.emplace_back(itr->second(proporties, l_enemy));
+    m_bullets.back()->Initialize(l_tower);
 }
 
 BulletProporties* BulletManager::GetProportiesFor(const BulletType &l_type)
@@ -80,6 +84,8 @@ BulletProporties* BulletManager::CreateProportiesFor(const BulletType &l_type)
         return proporties;
         break;
     case BulletType::Missile:
+        proporties->m_type == BulletType::Missile;
+        SetTextureForProporties("Tileset", sf::IntRect(1410, 640, 64, 64), proporties);
         return proporties;
         break;
     }

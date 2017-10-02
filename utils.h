@@ -36,10 +36,13 @@ namespace Utils
         return GetDataDirectory() + "\\enemies";
     }
 
+    inline std::string GetTowersDirectory() {
+        return GetDataDirectory() + "\\towers";
+    }
+
     inline bool CirclesColliding(const float& l_radius, const sf::Vector2f& l_pos, const float& l_radius2, const sf::Vector2f& l_pos2){
-        float a_square = pow(l_pos.x - l_pos2.x, 2);
-        float b_square = pow(l_pos.y - l_pos2.y, 2);
-        return (sqrt(a_square + b_square) <= l_radius + l_radius2);
+        sf::Vector2f dist(l_pos2 - l_pos);
+        return (dist.x * dist.x + dist.y * dist.y <= (l_radius + l_radius2) * (l_radius + l_radius2));
     }
 
     inline bool PointInsideCircle(const sf::Vector2i& l_point, const sf::Vector2f& l_pos, const float& l_radius){

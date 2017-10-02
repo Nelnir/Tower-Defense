@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "sharedcontext.h"
 #include "texturemanager.h"
-#include "abstractenemy.h"
+#include "EnemyBase.h"
 #include "statistics.h"
 
 enum Sheet{Tile_Size = 64, Sheet_Width = 1472, Sheet_Height = 832, Num_Layers = 2};
@@ -62,7 +62,7 @@ using Waypoints = std::vector<sf::Vector2f>;
 enum class Direction { Left = 0, Right, Up, Down, Middle };
 
 struct TowerProporties;
-using Connections = std::unordered_map<std::string, TowerProporties*>;
+using Connections = std::unordered_map<std::string, std::shared_ptr<TowerProporties>>;
 
 class GUI_Interface;
 class Level

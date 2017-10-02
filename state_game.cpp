@@ -33,6 +33,8 @@ void State_Game::OnCreate()
     interface->SetPosition({windowSize.x - interfaceSize.x, windowSize.y - interfaceSize.y});
 
     PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(Tower::Basic));
+    PrepareElement(interface->GetElement("Tower2"), m_towerManager.GetProporties(Tower::BasicPRO));
+    PrepareElement(interface->GetElement("Tower3"), m_towerManager.GetProporties(Tower::Missile));
 
     m_level = std::make_unique<Level>(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
     m_level->LoadTiles("tiles.cfg");
@@ -49,6 +51,8 @@ void State_Game::OnCreate()
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->AddCallback(StateType::Game, "Tower1", &State_Game::TowerPressed, this);
+    eveM->AddCallback(StateType::Game, "Tower2", &State_Game::TowerPressed, this);
+    eveM->AddCallback(StateType::Game, "Tower3", &State_Game::TowerPressed, this);
     eveM->AddCallback(StateType::Game, "Mouse_Left_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
@@ -57,6 +61,7 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "SpeedChange", &State_Game::SpeedChange, this);
 
     UpdateSpeedGUI();
+
 }
 
 void State_Game::OnDestroy()
@@ -66,6 +71,8 @@ void State_Game::OnDestroy()
 
     EventManager* eveM = m_stateMgr->GetContext()->m_eventManager;
     eveM->RemoveCallback(StateType::Game, "Tower1");
+    eveM->RemoveCallback(StateType::Game, "Tower2");
+    eveM->RemoveCallback(StateType::Game, "Tower3");
     eveM->RemoveCallback(StateType::Game, "Mouse_Left_Release");
     eveM->RemoveCallback(StateType::Game, "Mouse_Right_Release");
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
@@ -120,7 +127,7 @@ void State_Game::HandleRelease(EventDetails *l_details)
     m_towerManager.HandleRelease(l_details);
 }
 
-void State_Game::PrepareElement(GUI_Element *l_element, TowerProporties *l_proporties)
+void State_Game::PrepareElement(GUI_Element *l_element, const std::shared_ptr<TowerProporties>& l_proporties)
 {
     m_connections.emplace(l_element->GetName(), l_proporties);
     l_element->SetText(std::to_string(l_proporties->m_cost) + m_stateMgr->GetContext()->m_settings->GetCurrency());

@@ -1,4 +1,4 @@
-#include "abstractenemy.h"
+#include "EnemyBase.h"
 #include "enemymanager.h"
 #include "bullet.h"
 #include "level.h"
@@ -56,6 +56,7 @@ void EnemyBase::OnBulletHit(Bullet *l_bullet)
     if(m_unique.m_hp <= 0){ // if previous bullet attacked it, and it wasnt deleted yet
         return;
     }
+
     m_unique.m_hp -= l_bullet->GetDamage();
     if(m_unique.m_hp <= 0){
         m_enemyManager->RemoveEnemy(this);

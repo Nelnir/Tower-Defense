@@ -5,15 +5,18 @@
 #include "level.h"
 #include "utils.h"
 #include "enemymanager.h"
-#include "abstracttower.h"
+#include "TowerBase.h"
 #include "gui_manager.h"
+#include "tower_missile.h"
 
 TowerManager::TowerManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
     m_placingTower(nullptr), m_colliding(false), m_zoom(0.f),
     m_statistics(l_statistics), m_pressed(nullptr)
 {
-    RegisterProporties(Tower::Basic, CreateTowerProporties(Tower::Basic));
-    RegisterTower<AbstractTower>(Tower::Basic);
+    RegisterTower<TowerBase>(Tower::Basic);
+    RegisterTower<TowerBase>(Tower::BasicPRO);
+    RegisterTower<Tower_Missile>(Tower::Missile);
+    LoadConfigFile("towers.cfg");
 
     GUI_Manager* guiMgr = m_context->m_guiManager;
     guiMgr->LoadInterface(StateType::Game, "TowerUpgrade.interface", "TowerUpgrade");
@@ -33,8 +36,10 @@ void TowerManager::Purge()
     TextureManager* mgr = m_context->m_textureManager;
     for(auto& itr : m_towerProporties){
         mgr->ReleaseResource(itr.second->m_texture);
-        delete itr.second;
-        itr.second = nullptr;
+        if(itr.second->m_tower == Tower::Missile || itr.second->m_tower == Tower::MissilePRO){
+            auto missile = std::dynamic_pointer_cast<TowerMissileProporties>(itr.second);
+            mgr->ReleaseResource(missile->m_missileTexture);
+        }
     }
     m_towerProporties.clear();
     m_towers.clear();
@@ -45,48 +50,104 @@ void TowerManager::Purge()
     m_context->m_guiManager->RemoveInterface(StateType::Game, "TowerUpgrade");
 }
 
-TowerProporties* TowerManager::GetProporties(const Tower &l_type)
+void TowerManager::LoadConfigFile(const std::string &l_file)
+{
+    std::ifstream file;
+    file.open(Utils::GetTowersDirectory() + '\\' + l_file);
+    if(!file.is_open()){
+        std::cerr << "Error when opening towers config file: " << l_file << std::endl;
+    }
+
+    std::string line;
+    while(std::getline(file, line)){
+        std::stringstream keystream(line);
+        int towerType;
+        std::string path;
+        keystream >> towerType >> path;
+        LoadProportiesFor(static_cast<Tower>(towerType), path);
+    }
+    file.close();
+}
+
+void TowerManager::LoadProportiesFor(const Tower &l_type, const std::string &l_file)
+{
+    std::ifstream file;
+    file.open(Utils::GetTowersDirectory() + '\\' + l_file);
+    if(!file.is_open()){
+        std::cerr << "Error when opening tower file: " << l_file << std::endl;
+    }
+
+    std::shared_ptr<TowerProporties> proporties;
+    if(l_type == Tower::Basic || l_type == Tower::BasicPRO){
+       proporties = std::make_shared<TowerProporties>();
+    } else if(l_type == Tower::Missile || l_type == Tower::MissilePRO){
+        proporties = std::make_shared<TowerMissileProporties>();
+    }
+    proporties->m_towerRotation = false;
+    std::string line;
+    while(std::getline(file, line)){
+        if(line[0] == '|'){
+            continue;
+        }
+        std::stringstream keystream(line);
+        std::string type;
+        keystream >> type;
+
+        if(type == "COST"){
+            keystream >> proporties->m_cost;
+        } else if(type == "TYPE"){
+            int type;
+            keystream >> type;
+            proporties->m_tower = static_cast<Tower>(type);
+        } else if(type == "ATTACK"){
+            int bit;
+            keystream >> bit;
+            proporties->m_attacking.set(bit);
+        } else if(type == "BULLET"){
+            int bulletType;
+            keystream >> bulletType;
+            proporties->m_bulletType = static_cast<BulletType>(bulletType);
+        } else if(type == "COLLISION"){
+            if(!(static_cast<int>(proporties->m_tower) % 2)){
+                keystream >> proporties->m_radiusCollision;
+            } else{
+                keystream >> proporties->m_size.x >> proporties->m_size.y;
+            }
+        } else if(type == "ROTATION"){
+            proporties->m_towerRotation = true;
+            keystream >> proporties->m_towerRotationOffset;
+        } else if(type == "TEXTURE"){
+            sf::IntRect rect;
+            std::string texture;
+            keystream >> texture >> rect.left >> rect.top >> rect.width >> rect.height;
+            SetTextureForProporties(texture, rect, proporties);
+        } else if(type == "UPGRADE"){
+            UpgradeProporties upp;
+            keystream >> upp.m_cost >> upp.m_damage >> upp.m_firingRate >> upp.m_radius >> upp.m_bulletSpeed;
+            proporties->m_upgrades.emplace_back(upp);
+        } else if(l_type == Tower::Missile || l_type == Tower::MissilePRO){
+            if(type == "MISSILE"){
+                auto missile = std::dynamic_pointer_cast<TowerMissileProporties>(proporties);
+                sf::IntRect rect;
+                keystream >> missile->m_missileTexture >> rect.left >> rect.top >> rect.width >> rect.height;
+                m_context->m_textureManager->RequireResource(missile->m_missileTexture);
+                missile->m_missileSprite.setTexture(*m_context->m_textureManager->GetResource(missile->m_missileTexture));
+                missile->m_missileSprite.setTextureRect(rect);
+                missile->m_missileSprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
+            }
+        }
+    }
+    file.close();
+    RegisterProporties(l_type, proporties);
+}
+
+std::shared_ptr<TowerProporties> TowerManager::GetProporties(const Tower &l_type)
 {
     auto itr = m_towerProporties.find(l_type);
     return (itr == m_towerProporties.end() ? nullptr : itr->second);
 }
 
-TowerProporties* TowerManager::CreateTowerProporties(const Tower &l_type)
-{
-    TowerProporties * proporties = new TowerProporties;
-    switch(l_type)
-    {
-    case Tower::Basic:
-        proporties->m_cost = 100;
-        proporties->m_tower = Tower::Basic;
-        proporties->m_attacking.set(static_cast<int>(EnemyType::Land));
-        proporties->m_bulletType = BulletType::Normal;
-        proporties->m_radiusCollision = 30.f;
-        proporties->m_towerRotation = true;
-        SetTextureForProporties("Tileset", sf::IntRect(1216, 640, 64, 64), proporties);
-        UpgradeProporties upp;
-        upp.m_cost = 0;
-        upp.m_damage = 1;
-        upp.m_firingRate = 5.f;
-        upp.m_radius = 0.f;
-        upp.m_bulletSpeed = 1000.f;
-        proporties->m_upgrades.emplace_back(upp);
-        upp.m_cost = 150;
-        upp.m_damage = 1;
-        upp.m_radius = 0.f;
-        upp.m_firingRate = 250;
-        upp.m_bulletSpeed = 1250.f;
-        proporties->m_upgrades.emplace_back(upp);
-        break;
-    default:
-        delete proporties;
-        proporties = nullptr;
-        break;
-    }
-    return proporties;
-}
-
-void TowerManager::SetTextureForProporties(const std::string &l_texture, const sf::IntRect &l_rect, TowerProporties *l_proporties)
+void TowerManager::SetTextureForProporties(const std::string &l_texture, const sf::IntRect &l_rect, const std::shared_ptr<TowerProporties>& l_proporties)
 {
     TextureManager* mgr = m_context->m_textureManager;
     mgr->RequireResource(l_texture);
@@ -139,7 +200,7 @@ void TowerManager::DeleteTower(EventDetails *l_details)
     m_pressed.reset();
 }
 
-void TowerManager::Pressed(TowerProporties *l_proporties)
+void TowerManager::Pressed(const std::shared_ptr<TowerProporties> &l_proporties)
 {
     m_placingTower = l_proporties;
 }
@@ -148,24 +209,23 @@ void TowerManager::Draw()
 {
     sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
     for(auto& itr : m_towers){
-        itr->GetProporties()->m_sprite.setPosition(itr->GetPosition());
         itr->Draw(window);
     }
 
     if(m_placingTower){
         const sf::Vector2i mousePos = m_context->m_eventManager->GetMousePos(m_context->m_wind->getRenderWindow());
         const float& radiusC = m_placingTower->m_radiusCollision;
-        const sf::Vector2f currPlacingTowerPos = sf::Vector2f(mousePos.x * m_zoom - radiusC, mousePos.y * m_zoom - radiusC);
+        const sf::Vector2f currPlacingTowerPos = sf::Vector2f(mousePos.x * m_zoom, mousePos.y * m_zoom);
         sf::CircleShape range;
 
-        /// Check collison with other towers and draw thei collision circle
+        /// Check collison with other towers and draw their collision circle
         bool collidingWithTowers = false;
         range.setFillColor(sf::Color(0, 0, 0, 128));
         for(auto& itr : m_towers){
             const float& radius = itr->GetProporties()->m_radiusCollision;
             range.setRadius(radius);
-            sf::Vector2f pos = itr->GetPosition();
-            range.setPosition(sf::Vector2f(pos.x - radius, pos.y - radius));
+            range.setOrigin(radius, radius);
+            range.setPosition(itr->GetPosition());
             if(Utils::CirclesColliding(radius, range.getPosition(), radiusC, currPlacingTowerPos)){
                 range.setFillColor(sf::Color(255, 0, 0, 128));
                 collidingWithTowers = m_colliding = true;
@@ -179,12 +239,14 @@ void TowerManager::Draw()
         /// draw current placing tower attak circle
         range.setFillColor(sf::Color(0, 0, 0, 128));
         range.setRadius(AttackRadius);
-        range.setPosition(sf::Vector2f(mousePos.x * m_zoom - AttackRadius, mousePos.y * m_zoom - AttackRadius));
+        range.setOrigin(AttackRadius, AttackRadius);
+        range.setPosition(currPlacingTowerPos);
         window->draw(range);
 
         /// draw current placing tower collision circle
         range.setRadius(radiusC);
         range.setPosition(currPlacingTowerPos);
+        range.setOrigin(radiusC, radiusC);
         if(m_context->m_level->IsOutsideMap(range) || m_context->m_level->CollideWithPath(range)){ m_colliding = true; }
         else if (!collidingWithTowers){ m_colliding = false; }
 
@@ -268,7 +330,7 @@ void TowerManager::UpdateUpgradeGUI(UpgradeProporties *nextUpr)
     }
 }
 
-void TowerManager::ShowUpgradeInterfaceFor(const std::shared_ptr<AbstractTower>& l_tower)
+void TowerManager::ShowUpgradeInterfaceFor(const std::shared_ptr<TowerBase>& l_tower)
 {
     m_interface->SetActive(true);
     const float& radius = l_tower->GetProporties()->m_radiusCollision;
@@ -337,7 +399,7 @@ void TowerManager::HandleKey(EventDetails* l_details)
     }
 }
 
-void TowerManager::AddTower(TowerProporties *l_proporties, const sf::Vector2f& l_pos)
+void TowerManager::AddTower(const std::shared_ptr<TowerProporties>& l_proporties, const sf::Vector2f& l_pos)
 {
     auto itr = m_towerFactory.find(l_proporties->m_tower);
     if(itr == m_towerFactory.end()){

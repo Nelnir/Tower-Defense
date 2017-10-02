@@ -11,9 +11,9 @@ class EnemyBase;
 using Bullets = std::vector<Bullet*>;
 using BulletsToRemove = std::vector<Bullet*>;
 using BulletsProporties = std::unordered_map<BulletType, BulletProporties*>;
-using BulletFactory = std::unordered_map<BulletType, std::function<Bullet*(BulletProporties*, std::shared_ptr<EnemyBase>, AbstractTower*)>>;
+using BulletFactory = std::unordered_map<BulletType, std::function<Bullet*(BulletProporties*, std::shared_ptr<EnemyBase>)>>;
 
-class AbstractTower;
+class TowerBase;
 class BulletManager
 {
 public:
@@ -24,15 +24,15 @@ public:
     void Draw();
     void ProcessRequests();
     void RemoveBullet(Bullet* l_bullet);
-    void SpawnBullet(AbstractTower* l_tower, const std::shared_ptr<EnemyBase>& l_enemy);
+    void SpawnBullet(TowerBase* l_tower, const std::shared_ptr<EnemyBase>& l_enemy);
     BulletProporties* GetProportiesFor(const BulletType& l_type);
 private:
     BulletProporties* CreateProportiesFor(const BulletType& l_type);
     template <class T>
     void RegisterBullet(const BulletType& l_type){
-        m_factory[l_type] = [this](BulletProporties* l_proporties, std::shared_ptr<EnemyBase> l_enemy, AbstractTower* l_tower) -> Bullet*
+        m_factory[l_type] = [this](BulletProporties* l_proporties, std::shared_ptr<EnemyBase> l_enemy) -> Bullet*
         {
-            return new T(this, l_proporties, l_enemy, l_tower);
+            return new T(this, l_proporties, l_enemy);
         };
     }
     void RegisterProporties(const BulletType& l_type, BulletProporties* l_proporties);

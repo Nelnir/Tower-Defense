@@ -2,7 +2,7 @@
 #define STATISTICS_H
 
 #include <unordered_map>
-#include "abstractenemy.h"
+#include "EnemyBase.h"
 #include "gui_interface.h"
 
 class Statistics

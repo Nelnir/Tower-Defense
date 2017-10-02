@@ -63,7 +63,7 @@ public:
     void SetPosition(const sf::Vector2f& l_pos) { m_unique.m_position = l_pos; }
     void SetDestination(const sf::Vector2f& l_pos);
 
-    sf::Vector2f GetPositionAfter(const float& l_time, const bool& recurrency = false);
+    virtual sf::Vector2f GetPositionAfter(const float& l_time, const bool& recurrency = false);
 protected:
     EnemyManager* m_enemyManager;
     EnemyProporties* m_proporties;

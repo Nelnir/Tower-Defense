@@ -41,13 +41,15 @@ SOURCES += main.cpp \
     state_selectlevel.cpp \
     level.cpp \
     towermanager.cpp \
-    abstractenemy.cpp \
     enemymanager.cpp \
     state_gameover.cpp \
-    abstracttower.cpp \
     bulletmanager.cpp \
     bullet.cpp \
-    tank_enemy.cpp
+    tank_enemy.cpp \
+    TowerBase.cpp \
+    EnemyBase.cpp \
+    tower_missile.cpp \
+    missile.cpp
 
 HEADERS += \
     window.h \
@@ -79,15 +81,17 @@ HEADERS += \
     state_game.h \
     state_selectlevel.h \
     level.h \
-    abstracttower.h \
     towermanager.h \
-    abstractenemy.h \
     enemymanager.h \
     state_gameover.h \
     statistics.h \
     bulletmanager.h \
     bullet.h \
-    tank_enemy.h
+    tank_enemy.h \
+    TowerBase.h \
+    EnemyBase.h \
+    tower_missile.h \
+    missile.h
 
 DISTFILES += \
     Data/keys.cfg \
@@ -115,7 +119,6 @@ DISTFILES += \
     Data/Interfaces/Game.interface \
     Data/Styles/Game.style \
     Data/Styles/GameTitle.style \
-    Data/Styles/Tower1.style \
     Data/Styles/Start.style \
     Data/Enemies/Enemies.cfg \
     Data/Enemies/Soldier.proporties \
@@ -135,4 +138,9 @@ DISTFILES += \
     Data/Styles/TowerUpgradeInterface.style \
     Data/Styles/GameTextClickable.style \
     Data/Styles/GameTextNext.style \
-    Data/Styles/UpgradeButton.style
+    Data/Styles/UpgradeButton.style \
+    Data/Towers/Basic.tower \
+    Data/Towers/Towers.cfg \
+    Data/Towers/BasicPRO.tower \
+    Data/Styles/Tower.style \
+    Data/Towers/Missile.tower

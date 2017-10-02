@@ -1,7 +1,7 @@
 #ifndef TANK_ENEMY_H
 #define TANK_ENEMY_H
 
-#include "abstractenemy.h"
+#include "EnemyBase.h"
 
 struct TankProporties : public EnemyProporties{
     ~TankProporties() {}
