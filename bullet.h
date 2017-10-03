@@ -33,6 +33,8 @@ public:
     Bullet(BulletManager* l_manager, BulletProporties* m_proporties, std::shared_ptr<EnemyBase> m_enemy);
     virtual void Draw(sf::RenderWindow* l_window);
     virtual void Update(const float& l_dT);
+    virtual void OnEnemyDeath();
+    const std::shared_ptr<EnemyBase>& GetEnemy() { return m_unique.m_enemy; }
     const int& GetDamage() { return m_unique.m_damage; }
 protected:
     virtual void Initialize(TowerBase* l_tower = nullptr);

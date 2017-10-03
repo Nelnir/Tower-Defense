@@ -105,7 +105,6 @@ DISTFILES += \
     Data/Styles/MainMenu3.style \
     Data/Interfaces/About.interface \
     Data/Interfaces/MainMenu.interface \
-    Data/Interfaces/Settings.interface \
     Data/Interfaces/SelectLevel.interface \
     Data/Styles/LeftArrow.style \
     Data/Styles/RightArrow.style \
@@ -143,4 +142,15 @@ DISTFILES += \
     Data/Towers/Towers.cfg \
     Data/Towers/BasicPRO.tower \
     Data/Styles/Tower.style \
-    Data/Towers/Missile.tower
+    Data/Towers/Missile.tower \
+    Data/Towers/MissilePRO.tower \
+    Data/Enemies/plane.proporties \
+    Data/Enemies/Tank2.proporties \
+    Data/Enemies/Tank3.proporties \
+    Data/Enemies/plane2.proporties \
+    Data/Levels/Level-2.level \
+    Data/Enemies/plane3.proporties \
+    Data/Enemies/TankBoss.proporties \
+    Data/Enemies/planeBoss.proporties \
+    Data/Enemies/TankBossUltra.proporties \
+    Data/Levels/Level-3.level

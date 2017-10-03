@@ -49,3 +49,8 @@ void Bullet::Initialize(TowerBase* l_tower)
         m_unique.m_angle = l_tower->GetRotation() + 180;
     }
 }
+
+void Bullet::OnEnemyDeath()
+{
+
+}

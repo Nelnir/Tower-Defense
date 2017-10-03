@@ -26,14 +26,13 @@ public:
     void Draw();
     void Update(const float& l_dT);
 
+    sf::Vector2f GiveNextWaypoint(const std::shared_ptr<EnemyBase>& l_enemy);
     sf::Vector2f GiveNextWaypoint(EnemyBase* l_enemy);
     void ProcessRequests();
     void Restart();
     std::shared_ptr<EnemyBase> GetEnemyFor(const std::shared_ptr<TowerBase>& l_tower);
-    void RemoveEnemy(EnemyBase* l_enemy){
-        auto itr = std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](std::shared_ptr<EnemyBase>& a) { return a.get() == l_enemy; });
-        if(itr != m_enemies.end()){ m_toRemove.push_back(*itr); }
-    }
+    std::shared_ptr<EnemyBase> GetFirstEnemy() { if(!m_sorted.empty()) return m_sorted.front(); else return nullptr; }
+    void RemoveEnemy(const std::shared_ptr<EnemyBase>& l_enemy);
 
 private:
     void Sort();

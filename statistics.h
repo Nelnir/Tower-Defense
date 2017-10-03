@@ -20,8 +20,7 @@ public:
     void AddDmgDealt(const unsigned int& l_dmg) { m_totalDmgDealt += l_dmg; }
     void AddTimePlayed(const float& l_time) { m_timePlayed += l_time; }
     void AddEnemiesWithTypeKilled(const Enemy& l_type, const unsigned int& l_enemies = 1){
-        auto itr = m_enemiesTypeKilled.emplace(l_type, 0).first;
-        itr->second += l_enemies;
+        m_enemiesTypeKilled[l_type] += l_enemies;
     }
     void Reset(){
         m_totalMoneyEarned = m_totalMonstersKilled = m_totalTowersPlaced = 0;

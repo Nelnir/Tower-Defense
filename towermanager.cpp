@@ -10,7 +10,7 @@
 #include "tower_missile.h"
 
 TowerManager::TowerManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
-    m_placingTower(nullptr), m_colliding(false), m_zoom(0.f),
+    m_placingTower(nullptr), m_colliding(false),
     m_statistics(l_statistics), m_pressed(nullptr)
 {
     RegisterTower<TowerBase>(Tower::Basic);
@@ -211,11 +211,22 @@ void TowerManager::Draw()
     for(auto& itr : m_towers){
         itr->Draw(window);
     }
+    if(m_pressed){
+        sf::CircleShape range;
+        range.setRadius(m_pressed->GetUpgradeProporties().m_radius);
+        range.setPosition(m_pressed->GetPosition().x - range.getRadius(), m_pressed->GetPosition().y - range.getRadius());
+        range.setFillColor(sf::Color(0, 0, 0, 128));
+        window->draw(range);
+    }
+}
 
+void TowerManager::DrawPlacingTower()
+{
+    sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
     if(m_placingTower){
         const sf::Vector2i mousePos = m_context->m_eventManager->GetMousePos(m_context->m_wind->getRenderWindow());
         const float& radiusC = m_placingTower->m_radiusCollision;
-        const sf::Vector2f currPlacingTowerPos = sf::Vector2f(mousePos.x * m_zoom, mousePos.y * m_zoom);
+        const sf::Vector2f currPlacingTowerPos = m_context->m_wind->getRenderWindow()->mapPixelToCoords(mousePos);
         sf::CircleShape range;
 
         /// Check collison with other towers and draw their collision circle
@@ -258,16 +269,9 @@ void TowerManager::Draw()
         window->draw(range);
 
         /// draw current placing tower sprite
-        m_placingTower->m_sprite.setPosition(sf::Vector2f(mousePos.x * m_zoom, mousePos.y * m_zoom));
+        m_placingTower->m_sprite.setPosition(currPlacingTowerPos);
         m_placingTower->m_sprite.setRotation(0);
         window->draw(m_placingTower->m_sprite);
-    }
-    if(m_pressed){
-        sf::CircleShape range;
-        range.setRadius(m_pressed->GetUpgradeProporties().m_radius);
-        range.setPosition(m_pressed->GetPosition().x - range.getRadius(), m_pressed->GetPosition().y - range.getRadius());
-        range.setFillColor(sf::Color(0, 0, 0, 128));
-        window->draw(range);
     }
 }
 
@@ -301,7 +305,7 @@ void TowerManager::HandleRelease(EventDetails *l_details)
         AddTower(m_placingTower, m_placingTower->m_sprite.getPosition());
         m_placingTower = nullptr;
     } else {
-        sf::Vector2i mousePos = sf::Vector2i(l_details->m_mouse.x * m_zoom, l_details->m_mouse.y * m_zoom);
+        sf::Vector2i mousePos(m_context->m_wind->getRenderWindow()->mapPixelToCoords(l_details->m_mouse));
         for(auto& itr : m_towers){
             if(Utils::PointInsideCircle(mousePos, itr->GetPosition(), itr->GetProporties()->m_radiusCollision)){
                 m_pressed = itr;
@@ -334,7 +338,8 @@ void TowerManager::ShowUpgradeInterfaceFor(const std::shared_ptr<TowerBase>& l_t
 {
     m_interface->SetActive(true);
     const float& radius = l_tower->GetProporties()->m_radiusCollision;
-    const sf::Vector2f pos = sf::Vector2f((l_tower->GetPosition().x + radius) / m_zoom, (l_tower->GetPosition().y + radius) / m_zoom);
+    const sf::Vector2f pos(m_context->m_wind->getRenderWindow()->mapCoordsToPixel(
+                               sf::Vector2f((l_tower->GetPosition().x + radius), (l_tower->GetPosition().y + radius))));
     const sf::Vector2u windowSize = m_context->m_wind->GetWindowSize();
     /// 170 is size of game interface
     const sf::Vector2f diff = sf::Vector2f(windowSize.x - pos.x - 170 - m_interface->GetSize().x, windowSize.y - pos.y - m_interface->GetSize().y);

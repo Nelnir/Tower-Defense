@@ -10,9 +10,11 @@ public:
     void Update(const float &l_dT);
     void Draw(sf::RenderWindow *l_window);
     void Initialize(TowerBase *l_tower);
+    void OnEnemyDeath();
 private:
     void UpdateDestination();
     float m_speed;
+    float m_elapsed;
 };
 
 #endif // MISSILE_H

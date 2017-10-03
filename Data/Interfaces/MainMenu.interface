@@ -1,6 +1,5 @@
 Interface Main MainMenu1.style 0 0 imMovable NoTitle "Title"
 Element Label Title 35 0 MainMenu2.style "Future Defense"
 Element Label Play 50 75 MainMenu3.style "Play"
-Element Label Settings 50 125 MainMenu3.style "Settings"
-Element Label About 50 175 MainMenu3.style "About"
-Element Label Quit 50 225 MainMenu3.style "Quit"
+Element Label About 50 125 MainMenu3.style "About"
+Element Label Quit 50 175 MainMenu3.style "Quit"

@@ -8,6 +8,7 @@
 
 #include "texturemanager.h"
 #include "tank_enemy.h"
+#include "bulletmanager.h"
 
 EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) : m_context(l_context),
     m_statistics(l_statistics)
@@ -15,6 +16,7 @@ EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) :
     LoadConfigFile("enemies.cfg");
     RegisterEnemy<EnemyBase>(Enemy::Soldier);
     RegisterEnemy<Tank_Enemy>(Enemy::Tank);
+    RegisterEnemy<EnemyBase>(Enemy::Plane);
 }
 
 EnemyManager::~EnemyManager() { Purge(); }
@@ -92,10 +94,10 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
     }
 
     EnemyProporties* proporties;
-    if(l_enemy == Enemy::Soldier){
-        proporties = new EnemyProporties;
-    } else if(l_enemy == Enemy::Tank){
+    if(l_enemy == Enemy::Tank){
         proporties = new TankProporties;
+    } else {
+        proporties = new EnemyProporties;
     }
     proporties->m_enemy = l_enemy;
 
@@ -128,6 +130,10 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
             keystream >> proporties->m_lifeTakes;
         } else if(type == "MONEY"){
             keystream >> proporties->m_money;
+        } else if(type == "TEXTURE_COLOR"){
+         int r, g, b, a = 0;
+         keystream >> r >> g >> b >> a;
+         proporties->m_sprite.setColor(sf::Color(r, g, b, a));
         } else if(l_enemy == Enemy::Tank){
             if(type == "TANK"){
                 sf::IntRect rect;
@@ -136,6 +142,7 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
                 m_context->m_textureManager->RequireResource(prop->m_tankTexture);
                 prop->m_tankSprite.setTexture(*m_context->m_textureManager->GetResource(prop->m_tankTexture));
                 prop->m_tankSprite.setTextureRect(rect);
+                prop->m_tankSprite.setColor(proporties->m_sprite.getColor());
                 prop->m_tankSprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
             }
         }
@@ -151,8 +158,13 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
 void EnemyManager::Draw()
 {
     sf::RenderWindow* window = m_context->m_wind->getRenderWindow();
+    sf::RectangleShape hp;
+    hp.setFillColor(sf::Color::Green);
     for(auto& itr : m_enemies){
         itr->Draw(window);
+        hp.setSize(sf::Vector2f(50.f / (float(itr->GetEnemyProporties()->m_baseHp) / float(itr->GetProporties()->m_hp)), 4));
+        hp.setPosition(itr->GetProporties()->m_position.x - 26, itr->GetProporties()->m_position.y - 26);
+        window->draw(hp);
     }
 }
 
@@ -164,7 +176,7 @@ void EnemyManager::Update(const float &l_dT)
     Sort();
 }
 
-sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
+sf::Vector2f EnemyManager::GiveNextWaypoint(const std::shared_ptr<EnemyBase>& l_enemy)
 {
     sf::Vector2f dest = m_context->m_level->GetWaypointAfter(l_enemy->m_unique.m_waypoint);
     if(dest.x == -1 && dest.y == -1){
@@ -174,6 +186,12 @@ sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
     return dest;
 }
 
+sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
+{
+    auto itr = std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](const std::shared_ptr<EnemyBase>& enemy) { return enemy.get() == l_enemy;});
+    return GiveNextWaypoint(*itr);
+}
+
 void EnemyManager::ProcessRequests()
 {
     if(!m_toRemove.empty()){
@@ -181,6 +199,7 @@ void EnemyManager::ProcessRequests()
 
             m_enemies.erase(std::find(m_enemies.begin(), m_enemies.end(), m_toRemove.back()));
             m_sorted.erase(std::find(m_sorted.begin(), m_sorted.end(), m_toRemove.back()));
+            m_context->m_bulletManager->EnemyRemoved(m_toRemove.back());
 
             m_toRemove.pop_back();
         }
@@ -193,6 +212,8 @@ void EnemyManager::ProcessRequests()
 void EnemyManager::Restart()
 {
     m_enemies.clear();
+    m_sorted.clear();
+    m_toRemove.clear();
 }
 
 void EnemyManager::Sort()
@@ -238,4 +259,10 @@ std::shared_ptr<EnemyBase> EnemyManager::GetEnemyFor(const std::shared_ptr<Tower
     }
 
     return previous;
+}
+
+void EnemyManager::RemoveEnemy(const std::shared_ptr<EnemyBase>& l_enemy)
+{
+    auto itr = std::find(m_enemies.begin(), m_enemies.end(), l_enemy);
+    if(itr != m_enemies.end()){ m_toRemove.push_back(*itr); }
 }

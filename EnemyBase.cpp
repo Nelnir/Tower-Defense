@@ -57,9 +57,10 @@ void EnemyBase::OnBulletHit(Bullet *l_bullet)
         return;
     }
 
+
     m_unique.m_hp -= l_bullet->GetDamage();
     if(m_unique.m_hp <= 0){
-        m_enemyManager->RemoveEnemy(this);
+        m_enemyManager->RemoveEnemy(l_bullet->GetEnemy());
 
         Statistics* statistics = m_enemyManager->GetContext()->m_statistics;
         statistics->AddEnemiesWithTypeKilled(m_proporties->m_enemy);

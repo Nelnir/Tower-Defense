@@ -88,6 +88,7 @@ void Level::LoadLevel(const std::string &l_file)
     bool goingX = false;
     bool change = false;
     next.x = next.y = previous.x = previous.y = 0;
+    bool automaticWaypoints = true;
 
     std::string line;
     while(std::getline(file, line)){
@@ -151,7 +152,7 @@ void Level::LoadLevel(const std::string &l_file)
                 continue;
             }
 
-            if(change && !towerPlaceable){
+            if(change && !towerPlaceable && !tileLayer && automaticWaypoints){
                 AddWaypoint(sf::Vector2i(previous.x, previous.y));
             }
             change = false;
@@ -162,6 +163,12 @@ void Level::LoadLevel(const std::string &l_file)
             int direction;
             keystream >> direction;
             TransformPosition(m_waypoints.front(), static_cast<Direction>(direction));
+        } else if(type == "MANUAL_WAYPOINTS"){
+            automaticWaypoints = false;
+        } else if(type == "WAYPOINT"){
+            sf::Vector2i pos;
+            keystream >> pos.x >> pos.y;
+            AddWaypoint(pos);
         } else if(type == "END"){
             int direction;
             sf::Vector2i l_pos;
@@ -323,7 +330,7 @@ bool Level::CollideWithPath(const sf::CircleShape &l_circle)
 
 bool Level::IsOutsideMap(const sf::CircleShape &l_circle)
 {
-    sf::Vector2f mapSize = sf::Vector2f((m_maxMapSize.x - 1) * Sheet::Tile_Size, (m_maxMapSize.y - 1) * Sheet::Tile_Size);
+    sf::Vector2f mapSize = sf::Vector2f((m_maxMapSize.x) * Sheet::Tile_Size, (m_maxMapSize.y) * Sheet::Tile_Size);
     return !Utils::CircleAABBColliding(l_circle.getPosition(), l_circle.getRadius(), sf::FloatRect(0, 0, mapSize.x, mapSize.y));
 }
 
@@ -397,7 +404,7 @@ void Level::UpdateWaveTimeGUI()
 void Level::NextWave()
 {
     Wave* wave = m_waves[m_currentWave];
-    m_money += wave->m_reward;
+    AddMoney(wave->m_reward);
 
     m_statistics->AddMoneyEarned(wave->m_reward);
 

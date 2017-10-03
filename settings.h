@@ -13,7 +13,7 @@ class Settings
     const std::string m_creator = "Marcin Dzieciatkowski";
     const std::string m_github = "github.com/Nelnir/Tower-Defense";
     const sf::Vector2u m_resolution;
-    const int m_numberOfLevels = 6;
+    const int m_numberOfLevels = 4;
     int m_currentLevel;
     const std::string m_currency;
     bool m_won;

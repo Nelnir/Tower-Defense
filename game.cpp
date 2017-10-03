@@ -1,6 +1,6 @@
 #include "game.h"
 #include <iostream>
-Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution(), false),
+Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution()),
     m_stateManager(&m_context),
     m_guiManager(m_window.GetEventManager(), &m_context)
 {
@@ -12,19 +12,14 @@ Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution(), false
     m_context.m_settings = &m_settings;
     m_context.m_stateMgr = &m_stateManager;
 
-   // m_stateManager.SwitchTo(StateType::MainMenu);
-    m_stateManager.SwitchTo(StateType::Game);
+    m_stateManager.SwitchTo(StateType::MainMenu);
+   // m_stateManager.SwitchTo(StateType::Game);
 }
 
 Game::~Game()
 {
 
 }
-
-/*void Game::HandleInput()
-{
-
-}*/
 
 void Game::Update()
 {

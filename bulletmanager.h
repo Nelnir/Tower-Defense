@@ -25,7 +25,9 @@ public:
     void ProcessRequests();
     void RemoveBullet(Bullet* l_bullet);
     void SpawnBullet(TowerBase* l_tower, const std::shared_ptr<EnemyBase>& l_enemy);
+    void EnemyRemoved(const std::shared_ptr<EnemyBase>& l_enemy);
     BulletProporties* GetProportiesFor(const BulletType& l_type);
+    SharedContext* GetContext() { return m_context; }
 private:
     BulletProporties* CreateProportiesFor(const BulletType& l_type);
     template <class T>

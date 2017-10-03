@@ -21,13 +21,13 @@ public:
     std::shared_ptr<TowerProporties> GetProporties(const Tower& l_type);
     void Pressed(const std::shared_ptr<TowerProporties>& l_proporties);
     void Draw();
+    void DrawPlacingTower();
     void Update(const float& l_dT);
 
     void HandleRelease(EventDetails* l_details);
     void HandleKey(EventDetails* l_details);
     SharedContext* GetContext() { return m_context; }
     void Restart();
-    void SetZoom(const float& l_zoom) { m_zoom = l_zoom; }
     void CloseUpgrades(EventDetails* l_details) { m_interface->SetActive(false); m_pressed = nullptr; }
     void UpgradeTower(EventDetails* l_details);
     void ChangeStrategy(EventDetails* l_details);
@@ -60,7 +60,6 @@ private:
 
     std::shared_ptr<TowerProporties> m_placingTower;
     bool m_colliding;
-    float m_zoom;
     Statistics* m_statistics;
     std::shared_ptr<TowerBase> m_pressed;
     GUI_Interface* m_interface;

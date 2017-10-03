@@ -35,13 +35,13 @@ void State_Game::OnCreate()
     PrepareElement(interface->GetElement("Tower1"), m_towerManager.GetProporties(Tower::Basic));
     PrepareElement(interface->GetElement("Tower2"), m_towerManager.GetProporties(Tower::BasicPRO));
     PrepareElement(interface->GetElement("Tower3"), m_towerManager.GetProporties(Tower::Missile));
+    PrepareElement(interface->GetElement("Tower4"), m_towerManager.GetProporties(Tower::MissilePRO));
 
     m_level = std::make_unique<Level>(m_stateMgr->GetContext(), interface, &m_connections, &m_statistics);
     m_level->LoadTiles("tiles.cfg");
     m_level->LoadLevel("Level-" + std::to_string(m_stateMgr->GetContext()->m_settings->GetCurrentLevel()) + ".level");
     m_view.setCenter(m_level->GetCenter());
     m_view.zoom(m_level->GetZoom());
-    m_towerManager.SetZoom(m_level->GetZoom());
 
     m_stateMgr->GetContext()->m_towerManager = &m_towerManager;
     m_stateMgr->GetContext()->m_enemyManager = &m_enemyManager;
@@ -53,6 +53,7 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "Tower1", &State_Game::TowerPressed, this);
     eveM->AddCallback(StateType::Game, "Tower2", &State_Game::TowerPressed, this);
     eveM->AddCallback(StateType::Game, "Tower3", &State_Game::TowerPressed, this);
+    eveM->AddCallback(StateType::Game, "Tower4", &State_Game::TowerPressed, this);
     eveM->AddCallback(StateType::Game, "Mouse_Left_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
@@ -73,6 +74,7 @@ void State_Game::OnDestroy()
     eveM->RemoveCallback(StateType::Game, "Tower1");
     eveM->RemoveCallback(StateType::Game, "Tower2");
     eveM->RemoveCallback(StateType::Game, "Tower3");
+    eveM->RemoveCallback(StateType::Game, "Tower4");
     eveM->RemoveCallback(StateType::Game, "Mouse_Left_Release");
     eveM->RemoveCallback(StateType::Game, "Mouse_Right_Release");
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
@@ -97,12 +99,12 @@ void State_Game::Update(const sf::Time &l_time)
 
 void State_Game::Draw()
 {
-    for(unsigned int i = 0; i < Sheet::Num_Layers; ++i){
-       m_level->Draw(i);
-    }
+    m_level->Draw(0);
     m_towerManager.Draw();
     m_enemyManager.Draw();
     m_bulletManager.Draw();
+    m_level->Draw(1);
+    m_towerManager.DrawPlacingTower();
 }
 
 void State_Game::Activate()

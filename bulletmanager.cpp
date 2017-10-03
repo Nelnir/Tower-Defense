@@ -59,6 +59,15 @@ void BulletManager::SpawnBullet(TowerBase *l_tower, const std::shared_ptr<EnemyB
     m_bullets.back()->Initialize(l_tower);
 }
 
+void BulletManager::EnemyRemoved(const std::shared_ptr<EnemyBase> &l_enemy)
+{
+    for(auto& itr : m_bullets){
+        if(itr->GetEnemy() == l_enemy){
+            itr->OnEnemyDeath();
+        }
+    }
+}
+
 BulletProporties* BulletManager::GetProportiesFor(const BulletType &l_type)
 {
     auto itr = m_proporties.find(l_type);
@@ -95,7 +104,7 @@ BulletProporties* BulletManager::CreateProportiesFor(const BulletType &l_type)
 
 void BulletManager::RemoveBullet(Bullet* l_bullet)
 {
-    if(std::find(m_toRemove.begin(), m_toRemove.end(), l_bullet) != m_toRemove.end() || !l_bullet){
+    if(std::find(m_toRemove.begin(), m_toRemove.end(), l_bullet) != m_toRemove.end()){
         return;
     }
     m_toRemove.push_back(l_bullet);
