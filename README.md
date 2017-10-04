@@ -1,6 +1,6 @@
 # Future Defense
 As title suggests it's a clasic Tower Defense game, made with SFML and C++. <br/>
-It's just project created mainly for educational purposes, so if you want, you can use it however you like. <br/>
+It's just project created mainly for educational purposes, so if you want, you can use it almost however you like, just follow the rules of GNU General Public License.<br/>
 ## Here are some screens of the game
 ### Main menu
 ![image](https://user-images.githubusercontent.com/22370292/31185899-769b3558-a92d-11e7-8b3b-aa50aa49eaf0.png)
