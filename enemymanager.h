@@ -7,10 +7,12 @@
 #include <unordered_map>
 #include <functional>
 #include <memory>
+#include <utility>
 
 using Enemies = std::vector<std::shared_ptr<EnemyBase>>;
-using EnemyFactory = std::unordered_map<Enemy, std::function<EnemyBase*(EnemyProporties*)>>;
-using EnemiesProporties = std::unordered_map<Enemy, std::unordered_map<EnemyId, EnemyProporties*>>;
+using EnemyFactory = std::unordered_map<Enemy, std::function<std::shared_ptr<EnemyBase>(const std::shared_ptr<EnemyProporties>&)>>;
+using ProportiesFactory = std::unordered_map<Enemy, std::function<std::shared_ptr<EnemyProporties>()>>;
+using EnemiesProporties = std::unordered_map<Enemy, std::unordered_map<EnemyId, std::shared_ptr<EnemyProporties>>>;
 using EnemiesToRemove = std::vector<std::shared_ptr<EnemyBase>>;
 
 class TowerBase;
@@ -41,13 +43,20 @@ private:
     void LoadConfigFile(const std::string& l_file);
     template<class T>
     void RegisterEnemy(const Enemy& l_type){
-        m_factory[l_type] = [this](EnemyProporties* l_proporties) -> EnemyBase* {
-            return new T(l_proporties, this);
+        m_factory[l_type] = [this](const std::shared_ptr<EnemyProporties>& l_proporties) -> std::shared_ptr<EnemyBase> {
+            return std::move(std::make_shared<T>(l_proporties, this));
+        };
+    }
+    template<class T>
+    void RegisterProporties(const Enemy& l_type){
+        m_proportiesFactory[l_type] = [this]() -> std::shared_ptr<EnemyProporties> {
+            return std::move(std::make_shared<T>());
         };
     }
 
     SharedContext* m_context;
     EnemyFactory m_factory;
+    ProportiesFactory m_proportiesFactory;
     Enemies m_enemies;
     Enemies m_sorted; /// getting enemies for towers is faster
     EnemiesProporties m_enemyProporties;

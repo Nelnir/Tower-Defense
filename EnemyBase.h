@@ -3,7 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
-
 enum class Enemy { Soldier = 0, Tank = 2, Plane = 4}; // if %2 is equal to 0, then it's AABB collision otherwise circle
 enum class EnemyType { Land = 0, Air, Count };
 using EnemyId = unsigned int;
@@ -12,8 +11,11 @@ struct twoFloats{
     float x, y;
 };
 
+class TextureManager;
 struct EnemyProporties{
+
     virtual ~EnemyProporties() {}
+    virtual void ReadIn(std::stringstream& keystream, TextureManager* mgr) {}
     Enemy m_enemy;
     EnemyType m_type;
     float m_baseSpeed;
@@ -46,8 +48,7 @@ class EnemyBase
 {
     friend class EnemyManager;
 public:
-    EnemyBase(EnemyProporties* l_proporties, EnemyManager* l_mgr) : m_enemyManager(l_mgr){
-        m_proporties = l_proporties;
+    EnemyBase(const std::shared_ptr<EnemyProporties>& l_proporties, EnemyManager* l_mgr) : m_enemyManager(l_mgr), m_proporties(l_proporties){
         m_unique.m_hp = l_proporties->m_baseHp;
         m_unique.m_speed = l_proporties->m_baseSpeed;
     }
@@ -58,7 +59,7 @@ public:
     virtual void OnBulletHit(Bullet* l_bullet);
 
     Proporties* GetProporties() { return &m_unique; }
-    EnemyProporties* GetEnemyProporties() { return m_proporties; }
+    const std::shared_ptr<EnemyProporties>& GetEnemyProporties() { return m_proporties; }
 
     void SetPosition(const sf::Vector2f& l_pos) { m_unique.m_position = l_pos; }
     void SetDestination(const sf::Vector2f& l_pos);
@@ -66,7 +67,7 @@ public:
     virtual sf::Vector2f GetPositionAfter(const float& l_time, const bool& recurrency = false);
 protected:
     EnemyManager* m_enemyManager;
-    EnemyProporties* m_proporties;
+    std::shared_ptr<EnemyProporties> m_proporties;
     Proporties m_unique;
 };
 

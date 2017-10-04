@@ -196,17 +196,23 @@ void Level::LoadLevel(const std::string &l_file)
                     }
                 }
             }
-        } else if(type == "WAVE"){
+        } else if(type == "WAVE" || type == "WAVE_LOOP"){
             float interval, time;
             int reward;
+            int loop = 1;
             keystream >> interval >> reward >> time;
+            if(type == "WAVE_LOOP"){
+                keystream >> loop;
+            }
             if(time < 5){ time = 5; }
             Wave * wave = new Wave(interval, reward, time);
             while(!keystream.eof()){
                 int m_enemy;
                 EnemyId id;
                 keystream >> m_enemy >> id;
-                wave->m_enemies.emplace_back(std::make_pair(static_cast<Enemy>(m_enemy), id));
+                for(int i = 0;i<loop;++i){
+                    wave->m_enemies.emplace_back(std::make_pair(static_cast<Enemy>(m_enemy), id));
+                }
             }
             if(wave->m_enemies.empty()){
                 delete wave;

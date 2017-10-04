@@ -1,5 +1,4 @@
 #include "game.h"
-#include <iostream>
 Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution()),
     m_stateManager(&m_context),
     m_guiManager(m_window.GetEventManager(), &m_context)
@@ -13,7 +12,6 @@ Game::Game() : m_window(m_settings.GetTitle(), m_settings.GetResolution()),
     m_context.m_stateMgr = &m_stateManager;
 
     m_stateManager.SwitchTo(StateType::MainMenu);
-   // m_stateManager.SwitchTo(StateType::Game);
 }
 
 Game::~Game()

@@ -30,7 +30,7 @@ class Bullet
 {
     friend class BulletManager;
 public:
-    Bullet(BulletManager* l_manager, BulletProporties* m_proporties, std::shared_ptr<EnemyBase> m_enemy);
+    Bullet(BulletManager* l_manager, BulletProporties* m_proporties, const std::shared_ptr<EnemyBase>& m_enemy);
     virtual void Draw(sf::RenderWindow* l_window);
     virtual void Update(const float& l_dT);
     virtual void OnEnemyDeath();

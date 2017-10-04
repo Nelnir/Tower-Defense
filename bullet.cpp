@@ -3,7 +3,7 @@
 #include "TowerBase.h"
 #include "bulletmanager.h"
 #include <iostream>
-Bullet::Bullet(BulletManager* l_manager, BulletProporties* l_proporties, std::shared_ptr<EnemyBase> l_enemy) :
+Bullet::Bullet(BulletManager* l_manager, BulletProporties* l_proporties, const std::shared_ptr<EnemyBase>& l_enemy) :
     m_manager(l_manager),
     m_proporties(l_proporties),
     m_unique(l_enemy)

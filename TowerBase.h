@@ -24,6 +24,7 @@ enum class Tower { Basic = 0, BasicPRO = 2, Missile = 4, MissilePRO = 6}; // if 
 struct TowerProporties{ /// proporties which are the same to all towers X
     TowerProporties() : m_cost(0), m_tower(Tower::Basic) { }
     virtual ~TowerProporties() {}
+    virtual void ReadIn(std::stringstream& keystream, TextureManager* mgr) {}
     int m_cost;
     Upgrades m_upgrades;
     std::string m_texture;

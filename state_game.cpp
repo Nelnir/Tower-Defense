@@ -57,6 +57,7 @@ void State_Game::OnCreate()
     eveM->AddCallback(StateType::Game, "Mouse_Left_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Mouse_Right_Release", &State_Game::HandleRelease, this);
     eveM->AddCallback(StateType::Game, "Key_ESC", &State_Game::HandleKey, this);
+    eveM->AddCallback(StateType::Game, "Key_Q", &State_Game::HandleKey, this);
     eveM->AddCallback(StateType::Game, "Start_Game", &State_Game::StartGame, this);
     eveM->AddCallback(StateType::Game, "Key_P", &State_Game::StartGame, this);
     eveM->AddCallback(StateType::Game, "SpeedChange", &State_Game::SpeedChange, this);
@@ -78,6 +79,7 @@ void State_Game::OnDestroy()
     eveM->RemoveCallback(StateType::Game, "Mouse_Left_Release");
     eveM->RemoveCallback(StateType::Game, "Mouse_Right_Release");
     eveM->RemoveCallback(StateType::Game, "Key_ESC");
+    eveM->RemoveCallback(StateType::Game, "Key_Q");
     eveM->RemoveCallback(StateType::Game, "Start_Game");
     eveM->RemoveCallback(StateType::Game, "SpeedChange");
     eveM->RemoveCallback(StateType::Game, "Key_P");
@@ -143,6 +145,10 @@ void State_Game::PrepareElement(GUI_Element *l_element, const std::shared_ptr<To
 
 void State_Game::HandleKey(EventDetails *l_details)
 {
+    if(l_details->m_name == "Key_Q"){
+        m_stateMgr->Remove(StateType::Game);
+        m_stateMgr->SwitchTo(StateType::MainMenu);
+    }
     m_towerManager.HandleKey(l_details);
 }
 

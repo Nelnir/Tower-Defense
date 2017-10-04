@@ -17,6 +17,9 @@ EnemyManager::EnemyManager(SharedContext* l_context, Statistics* l_statistics) :
     RegisterEnemy<EnemyBase>(Enemy::Soldier);
     RegisterEnemy<Tank_Enemy>(Enemy::Tank);
     RegisterEnemy<EnemyBase>(Enemy::Plane);
+    RegisterProporties<EnemyProporties>(Enemy::Soldier);
+    RegisterProporties<TankProporties>(Enemy::Tank);
+    RegisterProporties<EnemyProporties>(Enemy::Plane);
 }
 
 EnemyManager::~EnemyManager() { Purge(); }
@@ -27,9 +30,8 @@ void EnemyManager::Purge()
         for(auto& itr2 : itr.second){
             m_context->m_textureManager->ReleaseResource(itr2.second->m_texture);
             if(itr2.second->m_enemy == Enemy::Tank){
-                m_context->m_textureManager->ReleaseResource(dynamic_cast<TankProporties*>(itr2.second)->m_tankTexture);
+                m_context->m_textureManager->ReleaseResource(std::dynamic_pointer_cast<TankProporties>(itr2.second)->m_tankTexture);
             }
-            delete itr2.second;
         }
     }
     m_enemyProporties.clear();
@@ -93,12 +95,7 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
         return;
     }
 
-    EnemyProporties* proporties;
-    if(l_enemy == Enemy::Tank){
-        proporties = new TankProporties;
-    } else {
-        proporties = new EnemyProporties;
-    }
+    std::shared_ptr<EnemyProporties> proporties = m_proportiesFactory[l_enemy]();
     proporties->m_enemy = l_enemy;
 
     std::string line;
@@ -126,30 +123,20 @@ void EnemyManager::LoadProporties(const Enemy& l_enemy, const EnemyId& l_id, con
             sf::IntRect rect;
             keystream >> rect.left >> rect.top >> rect.width >> rect.height;
             proporties->m_sprite.setTextureRect(rect);
+            proporties->m_sprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
         } else if(type == "LIFE_TAKES"){
             keystream >> proporties->m_lifeTakes;
         } else if(type == "MONEY"){
             keystream >> proporties->m_money;
         } else if(type == "TEXTURE_COLOR"){
-         int r, g, b, a = 0;
-         keystream >> r >> g >> b >> a;
-         proporties->m_sprite.setColor(sf::Color(r, g, b, a));
-        } else if(l_enemy == Enemy::Tank){
-            if(type == "TANK"){
-                sf::IntRect rect;
-                TankProporties* prop = dynamic_cast<TankProporties*>(proporties);
-                keystream >> prop->m_tankTexture >> rect.left >> rect.top >> rect.width >> rect.height;
-                m_context->m_textureManager->RequireResource(prop->m_tankTexture);
-                prop->m_tankSprite.setTexture(*m_context->m_textureManager->GetResource(prop->m_tankTexture));
-                prop->m_tankSprite.setTextureRect(rect);
-                prop->m_tankSprite.setColor(proporties->m_sprite.getColor());
-                prop->m_tankSprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
-            }
+            int r, g, b, a = 0;
+            keystream >> r >> g >> b >> a;
+            proporties->m_sprite.setColor(sf::Color(r, g, b, a));
+        } else if(type == "TANK" && l_enemy == Enemy::Tank){
+            proporties->ReadIn(keystream, m_context->m_textureManager);
         }
     }
-    sf::IntRect size = proporties->m_sprite.getTextureRect();
-    proporties->m_sprite.setOrigin(sf::Vector2f(size.width / 2.f, size.height / 2.f));
-    auto itr = m_enemyProporties.emplace(l_enemy, std::unordered_map<EnemyId, EnemyProporties*>()).first;
+    auto itr = m_enemyProporties.emplace(l_enemy, std::unordered_map<EnemyId, std::shared_ptr<EnemyProporties>>()).first;
     itr->second.emplace(l_id, proporties);
     file.close();
 }

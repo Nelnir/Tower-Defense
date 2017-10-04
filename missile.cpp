@@ -4,7 +4,7 @@
 #include "bulletmanager.h"
 #include "TowerBase.h"
 #include "enemymanager.h"
-Missile::Missile(BulletManager *l_manager, BulletProporties *m_proporties, std::shared_ptr<EnemyBase> m_enemy) :
+Missile::Missile(BulletManager *l_manager, BulletProporties *m_proporties, const std::shared_ptr<EnemyBase>& m_enemy) :
     Bullet(l_manager, m_proporties, m_enemy), m_elapsed(0)
 {
     UpdateDestination();

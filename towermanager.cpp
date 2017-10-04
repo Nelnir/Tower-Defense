@@ -125,16 +125,8 @@ void TowerManager::LoadProportiesFor(const Tower &l_type, const std::string &l_f
             UpgradeProporties upp;
             keystream >> upp.m_cost >> upp.m_damage >> upp.m_firingRate >> upp.m_radius >> upp.m_bulletSpeed;
             proporties->m_upgrades.emplace_back(upp);
-        } else if(l_type == Tower::Missile || l_type == Tower::MissilePRO){
-            if(type == "MISSILE"){
-                auto missile = std::dynamic_pointer_cast<TowerMissileProporties>(proporties);
-                sf::IntRect rect;
-                keystream >> missile->m_missileTexture >> rect.left >> rect.top >> rect.width >> rect.height;
-                m_context->m_textureManager->RequireResource(missile->m_missileTexture);
-                missile->m_missileSprite.setTexture(*m_context->m_textureManager->GetResource(missile->m_missileTexture));
-                missile->m_missileSprite.setTextureRect(rect);
-                missile->m_missileSprite.setOrigin(sf::Vector2f(rect.width / 2.f, rect.height / 2.f));
-            }
+        } else if(type == "MISSILE" && (l_type == Tower::Missile || l_type == Tower::MissilePRO)){
+            proporties->ReadIn(keystream, m_context->m_textureManager);
         }
     }
     file.close();

@@ -6,7 +6,7 @@
 class Missile : public Bullet
 {
 public:
-    Missile(BulletManager* l_manager, BulletProporties* m_proporties, std::shared_ptr<EnemyBase> m_enemy);
+    Missile(BulletManager* l_manager, BulletProporties* m_proporties, const std::shared_ptr<EnemyBase>& m_enemy);
     void Update(const float &l_dT);
     void Draw(sf::RenderWindow *l_window);
     void Initialize(TowerBase *l_tower);

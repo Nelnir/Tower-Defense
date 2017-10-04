@@ -153,4 +153,9 @@ DISTFILES += \
     Data/Enemies/TankBoss.proporties \
     Data/Enemies/planeBoss.proporties \
     Data/Enemies/TankBossUltra.proporties \
-    Data/Levels/Level-3.level
+    Data/Levels/Level-3.level \
+    Data/Levels/Level-4.level \
+    Data/Enemies/Soldier3.proporties \
+    Data/Enemies/TankSand.proporties \
+    Data/Enemies/Soldier4.proporties \
+    Data/Enemies/PlaneSandBoss.proporties

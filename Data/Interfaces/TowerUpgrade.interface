@@ -1,6 +1,6 @@
 Interface Main TowerUpgradeInterface.style 5 5 Movable Title "Upgrades"
 Element Label Upgrades 5 5 GameText.style ""
-Element Label Delete 213 11 GameTextClickable.style "Delete"
+Element Label Delete 235 11 GameTextClickable.style "Sell"
 Element Label Damage 0 30 GameText.style ""
 Element Label Damage+ 0 30 GameTextNext.style ""
 Element Label FiringRate 0 50 GameText.style ""
