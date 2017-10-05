@@ -17,28 +17,28 @@ void EnemyBase::Update(const float &l_dT)
         m_unique.m_position.x -= m_unique.m_speed * l_dT;
         if(m_unique.m_position.x < m_unique.m_destination.x){
             m_unique.m_position.x = m_unique.m_destination.x;
-            SetDestination(m_enemyManager->GiveNextWaypoint(shared_from_this()));
+            SetDestination(m_enemyManager->GiveNextWaypoint(this));
         }
         break;
     case MoveDirection::Right:
         m_unique.m_position.x += m_unique.m_speed * l_dT;
         if(m_unique.m_position.x > m_unique.m_destination.x){
             m_unique.m_position.x = m_unique.m_destination.x;
-            SetDestination(m_enemyManager->GiveNextWaypoint(shared_from_this()));
+            SetDestination(m_enemyManager->GiveNextWaypoint(this));
         }
         break;
     case MoveDirection::Up:
         m_unique.m_position.y -= m_unique.m_speed * l_dT;
         if(m_unique.m_position.y < m_unique.m_destination.y){
             m_unique.m_position.y = m_unique.m_destination.y;
-            SetDestination(m_enemyManager->GiveNextWaypoint(shared_from_this()));
+            SetDestination(m_enemyManager->GiveNextWaypoint(this));
         }
         break;
     case MoveDirection::Down:
         m_unique.m_position.y += m_unique.m_speed * l_dT;
         if(m_unique.m_position.y > m_unique.m_destination.y){
             m_unique.m_position.y = m_unique.m_destination.y;
-            SetDestination(m_enemyManager->GiveNextWaypoint(shared_from_this()));
+            SetDestination(m_enemyManager->GiveNextWaypoint(this));
         }
         break;
     }
@@ -137,7 +137,7 @@ sf::Vector2f EnemyBase::GetPositionAfter(const float &l_time, const bool& l_recu
         sf::Vector2f copyDes = m_unique.m_destination;
 
         m_unique.m_position = pos;
-        sf::Vector2f l_pos = m_enemyManager->GiveNextWaypoint(shared_from_this());
+        sf::Vector2f l_pos = m_enemyManager->GiveNextWaypoint(this);
         SetDestination(l_pos);
         pos = GetPositionAfter(l_time - subtract, true);
 

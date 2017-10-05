@@ -217,8 +217,9 @@ pip-log.txt
 
 # mine
 
-src/release/
-stc/debug/
+release/
+debug/
+Data/Textures/GUI
 
 *.Release
 *.Debug

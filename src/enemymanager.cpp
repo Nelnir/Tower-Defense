@@ -173,6 +173,12 @@ sf::Vector2f EnemyManager::GiveNextWaypoint(const std::shared_ptr<EnemyBase>& l_
     return dest;
 }
 
+sf::Vector2f EnemyManager::GiveNextWaypoint(EnemyBase *l_enemy)
+{
+    auto itr = std::find_if(m_enemies.begin(), m_enemies.end(), [&l_enemy](const std::shared_ptr<EnemyBase>& enemy) { return enemy.get() == l_enemy;});
+    return GiveNextWaypoint(*itr);
+}
+
 void EnemyManager::ProcessRequests()
 {
     if(!m_toRemove.empty()){

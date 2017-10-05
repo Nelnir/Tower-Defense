@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <sstream>
 #include "settings.h"
-
+#include <iostream>
 namespace Utils
 {
     inline std::string GetWorkingDirectory() {
