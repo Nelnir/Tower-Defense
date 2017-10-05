@@ -29,7 +29,6 @@ public:
     void Update(const float& l_dT);
 
     sf::Vector2f GiveNextWaypoint(const std::shared_ptr<EnemyBase>& l_enemy);
-    sf::Vector2f GiveNextWaypoint(EnemyBase* l_enemy);
     void ProcessRequests();
     void Restart();
     std::shared_ptr<EnemyBase> GetEnemyFor(const std::shared_ptr<TowerBase>& l_tower);

@@ -41,7 +41,7 @@ struct TileInfo{
 struct Tile{
     TileInfo* m_proporties;
     bool m_towerPlaceable;
-    // others flag unique to each tile
+    // others flags unique to each tile
 };
 
 
