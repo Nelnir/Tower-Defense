@@ -44,7 +44,7 @@ struct Proporties{
 
 class Bullet;
 class EnemyManager;
-class EnemyBase
+class EnemyBase : public std::enable_shared_from_this<EnemyBase>
 {
     friend class EnemyManager;
 public:
