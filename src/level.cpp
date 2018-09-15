@@ -68,7 +68,7 @@ Tile* Level::GetTile(const unsigned int &l_x, const unsigned int &l_y, const uns
     if(l_x < 0 || l_y < 0 || l_x >= m_maxMapSize.x || l_y >= m_maxMapSize.y || l_layer < 0 || l_layer >= Sheet::Num_Layers){
         return nullptr;
     }
-    auto & itr = m_tileMap.find(ConvertCoords(l_x, l_y, l_layer));
+    auto itr = m_tileMap.find(ConvertCoords(l_x, l_y, l_layer));
     return (itr != m_tileMap.end() ? itr->second : nullptr);
 }
 

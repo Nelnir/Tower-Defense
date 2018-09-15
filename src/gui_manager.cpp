@@ -46,7 +46,7 @@ GUI_Manager::~GUI_Manager()
 
 bool GUI_Manager::AddInterface(const StateType& l_state, const std::string& l_name)
 {
-    auto& itr = m_interfaces.emplace(l_state, GUI_Interfaces()).first;
+    auto itr = m_interfaces.emplace(l_state, GUI_Interfaces()).first;
 
     GUI_Interface* temp = new GUI_Interface(l_name, this);
     if (itr->second.emplace(l_name, temp).second){
@@ -58,11 +58,11 @@ bool GUI_Manager::AddInterface(const StateType& l_state, const std::string& l_na
 }
 GUI_Interface* GUI_Manager::GetInterface(const StateType &l_state, const std::string &l_name)
 {
-    auto& itr = m_interfaces.find(l_state);
+    auto itr = m_interfaces.find(l_state);
     if(itr == m_interfaces.end()){
         return nullptr;
     }
-    auto& itr2 = itr->second.find(l_name);
+    auto itr2 = itr->second.find(l_name);
     return (itr2 == itr->second.end() ? nullptr : itr2->second);
 }
 
@@ -138,7 +138,7 @@ void GUI_Manager::HandleRelease(EventDetails* l_details)
 
 void GUI_Manager::HandleTextEntered(EventDetails* l_details)
 {
-     auto& state = m_interfaces.find(m_currentState);
+     auto state = m_interfaces.find(m_currentState);
      if (state == m_interfaces.end()){
          return;
      }

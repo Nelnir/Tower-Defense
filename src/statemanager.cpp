@@ -150,7 +150,7 @@ void StateManager::SwitchTo(const StateType &l_type)
 
 bool StateManager::CreateState(const StateType &l_type)
 {
-    auto& newState = m_stateFactory.find(l_type);
+    auto newState = m_stateFactory.find(l_type);
     if(newState == m_stateFactory.end()){
         return false;
     }

@@ -13,7 +13,7 @@ SpriteSheet::~SpriteSheet() { ReleaseSheet(); }
 void SpriteSheet::ReleaseSheet()
 {
     while(m_animations.begin() != m_animations.end()){
-        auto & itr = m_animations.begin();
+        auto itr = m_animations.begin();
         delete itr->second;
         m_animations.erase(itr);
     }

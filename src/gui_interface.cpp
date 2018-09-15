@@ -66,7 +66,7 @@ GUI_Element* GUI_Interface::GetElement(const std::string& l_name) const
 
 bool GUI_Interface::RemoveElement(const std::string& l_name)
 {
-    auto& itr = m_elements.find(l_name);
+    auto itr = m_elements.find(l_name);
     if (itr == m_elements.end()){
         return false;
     }
